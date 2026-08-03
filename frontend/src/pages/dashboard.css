@@ -1,0 +1,126 @@
+/* 1. Amélioration globale de la police sur le conteneur */
+.dashboard-container {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 2. Titre de la carte (ex: "Bâtiments", "Recettes") */
+.kpi-title {
+  font-size: 0.825rem; /* ~13px */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em; /* Aère les lettres majuscules/titres */
+  color: #64748b; /* Gris slate doux au lieu d'un noir brut */
+}
+
+/* 3. Valeurs principales (ex: "12 500 FCFA") */
+.kpi-value {
+  font-size: 1.625rem; /* ~26px */
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em; /* Rapproche légèrement les grands chiffres */
+  color: #0f172a; /* Nuit très sombre, élégant */
+  margin: 0.35rem 0 0.25rem 0;
+  font-feature-settings: "tnum"; /* Garantit l'alignement tabulaire des chiffres */
+  font-variant-numeric: tabular-nums;
+}
+
+/* 4. Sous-titre / Légende sous la valeur */
+.kpi-sub {
+  font-size: 0.775rem; /* ~12px */
+  font-weight: 400;
+  color: #94a3b8; /* Gris plus clair pour la hiérarchie */
+  display: block;
+}
+
+/* 5. Panneaux de cartes (Section Alertes / Tableau) */
+.card-panel-header h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: -0.01em;
+}
+
+/* Badge de compteur d'alertes */
+.count-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-feature-settings: "tnum";
+}
+
+/* 6. Messages dans le tableau des alertes */
+.data-table td {
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.5;
+}
+
+.data-table .font-medium {
+  font-weight: 500;
+  color: #334155;
+}
+
+/* ==========================================
+   RESPONSIVE GLOBAL - MOBILE
+   ========================================== */
+@media (max-width: 768px) {
+  .kpi-grid,
+  .skeleton-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-title-group {
+    width: 100%;
+  }
+
+  .card-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  table th,
+  table td {
+    padding: 12px 14px !important;
+    font-size: 13px;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-table-action {
+    padding: 8px 12px;
+    font-size: 12.5px;
+  }
+
+  .modal {
+    max-width: 100%;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .capacity-cell {
+    width: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar h1 {
+    font-size: 15px;
+  }
+
+  .topbar {
+    padding: 0 14px;
+  }
+
+  .kpi-value {
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,390 @@
+/* 1. Reset de base et conteneur principal */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.login-container {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0F172A;
+  padding: 1rem; /* Marge interne pour éviter que la carte touche les bords sur mobile */
+}
+
+/* 2. Carte de connexion */
+.login-card {
+  width: 100%;
+  max-width: 420px; /* Taille idéale sur grand écran */
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  border: 1px solid #e2e8f0;
+}
+
+/* 3. En-tête / Logo */
+.login-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-logo {
+  height: 64px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 0.5rem;
+}
+
+.login-header h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.login-header .sub {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+/* 4. Formulaire et Champs */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem; /* Espace pour l'icône à gauche */
+  font-size: 0.95rem;
+  color: #0f172a;
+  background-color: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-wrapper input:focus {
+  border-color: #f59e0b; /* Couleur ambre / dorée */
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+/* 5. Alertes d'erreur et info */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+}
+
+.alert-icon {
+  flex-shrink: 0;
+}
+
+.alert-info {
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
+}
+
+.alert-error {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+}
+
+/* 6. Bouton de connexion */
+.btn-login {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  background-color: #d97706;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+  transition: background-color 0.2s ease;
+}
+
+.btn-login:hover:not(:disabled) {
+  background-color: darkgreen;
+}
+
+.btn-login:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* 7. Pied de carte */
+.login-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* 8. Adaptation pour Écrans Mobiles (< 480px) */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem 1.25rem; /* On réduit un peu les marges internes sur petits écrans */
+    border-radius: 12px;
+  }
+
+  .login-logo {
+    height: 52px;
+  }
+
+  .login-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .btn-login {
+    padding: 0.75rem; /* Bouton tactile confortable pour les doigts */
+  }
+}
+
+/* Container principal (Centré verticalement et horizontalement) */
+.sp-page {
+  min-height: 100vh;
+  min-height: 100dvh; /* Support des claviers virtuels mobiles */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F3e8ff;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* Carte principale */
+.sp-card {
+  width: 100%;
+  max-width: 420px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  box-sizing: border-box;
+}
+
+.sp-card-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* En-tête */
+.sp-header {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.sp-card-center .sp-header {
+  text-align: center;
+}
+
+.sp-card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #6D28D9;
+  margin: 0 0 0.5rem 0;
+}
+
+.sp-sub {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Formulaire */
+.sp-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sp-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  text-align: left;
+}
+
+.sp-field label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Inputs & Icônes */
+.sp-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sp-input-icon {
+  position: absolute;
+  left: 0.875rem;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.sp-input {
+  width: 100%;
+  padding: 0.75rem 0.875rem 0.75rem 2.6rem;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-sizing: border-box;
+}
+
+.sp-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Alertes */
+.sp-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 0.875rem;
+  line-height: 1.3;
+}
+
+.sp-alert-icon {
+  flex-shrink: 0;
+}
+
+/* Boutons */
+.sp-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.938rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+  box-sizing: border-box;
+  border: none;
+  min-height: 44px; /* Meilleur confort tactile sur mobile */
+}
+
+.sp-btn-primary {
+  background-color: #8B5CF6;
+  color: #ffffff;
+}
+
+.sp-btn-primary:hover:not(:disabled) {
+  background-color: #6D28D9;
+}
+
+.sp-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.sp-btn-secondary {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  margin-top: 1rem;
+}
+
+.sp-btn-secondary:hover {
+  background-color: #e2e8f0;
+}
+
+/* Wrapper d'icônes d'état (Succès / Erreur) */
+.sp-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+
+.sp-icon-success {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.sp-icon-error {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Optimisation Écrans Mobiles (< 480px) */
+@media (max-width: 480px) {
+  .sp-page {
+    padding: 0.75rem;
+  }
+
+  .sp-card {
+    padding: 1.25rem 1rem;
+    border-radius: 10px;
+  }
+
+  .sp-card h2 {
+    font-size: 1.25rem;
+  }
+}

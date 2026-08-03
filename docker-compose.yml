@@ -1,0 +1,59 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: nk_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-nk_avicole}
+      POSTGRES_USER: ${DB_USER:-nk_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme_db_password}
+    volumes:
+      - nk_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-nk_admin} -d ${DB_NAME:-nk_avicole}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: nk_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-nk_avicole}
+      DB_USER: ${DB_USER:-nk_admin}
+      DB_PASSWORD: ${DB_PASSWORD:-changeme_db_password}
+      JWT_SECRET: ${JWT_SECRET:-change_this_jwt_secret_in_production}
+      JWT_EXPIRES: ${JWT_EXPIRES:-8h}
+      INACTIVITY_TIMEOUT_MIN: ${INACTIVITY_TIMEOUT_MIN:-30}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-no-reply@nk-avicole.local}
+    ports:
+      - "4000:4000"
+    volumes:
+      - nk_uploads:/app/uploads
+
+  frontend:
+    build: ./frontend
+    container_name: nk_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  nk_pgdata:
+  nk_uploads:

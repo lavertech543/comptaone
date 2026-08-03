@@ -1,0 +1,984 @@
+/* ==========================================
+   ONGLETS (TABS BAR) SAAS
+   ========================================== */
+.tabs-header {
+  padding: 12px 20px 0 20px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: #0f172a;
+}
+
+.tab-btn.active {
+  color: #10b981;
+  font-weight: 600;
+  border-bottom-color: #10b981;
+}
+
+/* Badge Traitement Sanitaire */
+.treatment-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background-color: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* ==========================================
+   DESIGN FINTECH & ÉLÉGANCE AVANCÉE
+   ========================================== */
+
+/* Badge Pro dans le Header */
+.pro-pill {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+}
+
+/* Bouton Primaire Fintech avec ombre douce */
+.btn-primary-fintech {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background-color: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
+}
+
+.btn-primary-fintech:hover:not(:disabled) {
+  background-color: #1e293b;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+/* Bandeau KPI Rapide */
+.quick-kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 20px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.kpi-icon-wrapper {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-icon-wrapper.emerald { background: #ecfdf5; color: #10b981; }
+.kpi-icon-wrapper.rose    { background: #fff1f2; color: #f43f5e; }
+.kpi-icon-wrapper.indigo  { background: #eef2ff; color: #6366f1; }
+
+.kpi-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.kpi-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  font-family: inherit;
+}
+
+.kpi-sub {
+  margin-left: auto;
+  font-size: 12px;
+  color: #94a3b8;
+  background: #f8fafc;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid #f1f5f9;
+}
+
+/* Panneau de table + En-tête combiné */
+.card-panel-fintech {
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.panel-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Barre d'onglets FinTech Pill Style */
+.tabs-bar-fintech {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #f8fafc;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #f1f5f9;
+}
+
+.tab-btn-fintech {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #64748b;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tab-btn-fintech:hover {
+  color: #0f172a;
+}
+
+.tab-btn-fintech.active {
+  background-color: #ffffff;
+  color: #0f172a;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Recherche Rapide */
+.table-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 240px;
+}
+
+.table-search-box .search-icon {
+  position: absolute;
+  left: 10px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.table-search-box input {
+  width: 100%;
+  padding: 6px 28px 6px 32px;
+  font-size: 12.5px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.table-search-box input:focus {
+  background: #ffffff;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.clear-search {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+/* Éléments de cellules riches */
+.table-date-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: monospace;
+  font-size: 12px;
+  color: #475569;
+}
+
+.badge-band {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: monospace;
+  font-weight: 600;
+  font-size: 12px;
+  color: #334155;
+  background: #f1f5f9;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+/* Pill de métriques (morts / quantité) */
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: monospace;
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+.metric-pill.emerald {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.metric-pill.rose {
+  background: #fff1f2;
+  color: #e11d48;
+  border: 1px solid #fecdd3;
+}
+
+/* Badges de traitement */
+.treatment-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.treatment-badge.vaccin { background: #e0e7ff; color: #3730a3; }
+.treatment-badge.traitement { background: #fef3c7; color: #92400e; }
+.treatment-badge.medicament { background: #f0fdf4; color: #166534; }
+/* ==========================================
+   ESTHÉTIQUE DES CHAMPS DE FORMULAIRE FINTECH
+   ========================================== */
+
+.fintech-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 4px 0;
+  margin-top: 15px;
+}
+
+/* Groupe de champ stylisé */
+.input-group-styled {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Container d'input avec icône ancrée */
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+/* Inputs & Selects modernes */
+.styled-input,
+.styled-select {
+  width: 100%;
+  padding: 10px 12px 10px 38px;
+  font-size: 13.5px;
+  color: #0f172a;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.styled-input:focus,
+.styled-select:focus {
+  background-color: #ffffff;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+}
+
+.styled-input:focus + .input-icon,
+.input-icon-wrapper:focus-within .input-icon {
+  color: #10b981;
+}
+
+/* Mise en avant du champ Fournisseur */
+.input-group-styled.highlight .styled-input {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.input-group-styled.highlight .styled-input:focus {
+  border-color: #10b981;
+}
+
+/* Grille de sélection des modes de paiement (Pills) */
+.payment-pills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+@media (min-width: 500px) {
+  .payment-pills-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.payment-pill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #64748b;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.payment-pill-btn:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.payment-pill-btn.active {
+  background-color: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(16, 185, 129, 0.08);
+}
+
+.payment-pill-btn .check-mark {
+  color: #10b981;
+}
+
+/* Carte de résumé financier dynamique */
+.fintech-summary-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  padding: 16px 20px;
+  border-radius: 10px;
+  color: #ffffff;
+  margin-top: 4px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+}
+
+.summary-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.summary-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.summary-calc {
+  font-size: 12px;
+  color: #cbd5e1;
+  font-family: monospace;
+}
+
+.summary-total-display {
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #34d399; /* Vert Émeraude FinTech */
+  text-shadow: 0 0 12px rgba(52, 211, 153, 0.2);
+}
+
+/* ==========================================================================
+   LAYOUT GENERAL & HEADERS
+   ========================================================================== */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+}
+
+.page-icon.icon-blue {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.sub-text {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.pro-pill-blue {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+/* ==========================================================================
+   CARTOUCHES KPIS
+   ========================================================================== */
+.kpi-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.quick-kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.kpi-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.kpi-icon-wrapper.emerald { background-color: #dcfce7; color: #16a34a; }
+.kpi-icon-wrapper.rose    { background-color: #ffe4e6; color: #e11d48; }
+.kpi-icon-wrapper.indigo  { background-color: #e0e7ff; color: #4f46e5; }
+
+.kpi-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.kpi-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.text-emerald { color: #16a34a; }
+.text-rose    { color: #e11d48; }
+
+/* ==========================================================================
+   TABLEAU FINTECH & RECHERCHE
+   ========================================================================== */
+.card-panel-fintech {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.panel-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.panel-title-sm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.table-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.table-search-box input {
+  padding: 6px 12px 6px 30px;
+  font-size: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  outline: none;
+  width: 240px;
+  transition: border-color 0.15s;
+}
+
+.table-search-box input:focus {
+  border-color: #2563eb;
+}
+
+.search-icon {
+  position: absolute;
+  left: 9px;
+  color: #94a3b8;
+}
+
+.clear-search {
+  position: absolute;
+  right: 8px;
+  border: none;
+  background: none;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.table-date-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #475569;
+}
+
+/* ==========================================================================
+   BADGES COLORÉS DANS LE TABLEAU
+   ========================================================================== */
+/* Badges pour les types */
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.type-badge.recette {
+  background-color: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.type-badge.depense {
+  background-color: #ffe4e6;
+  color: #be123c;
+  border: 1px solid #fecdd3;
+}
+
+/* Badges pour les catégories */
+.cat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cat-emerald { background-color: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.cat-blue    { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.cat-indigo  { background-color: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; }
+.cat-amber   { background-color: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.cat-rose    { background-color: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+.cat-violet  { background-color: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
+.cat-cyan    { background-color: #ecfeff; color: #0e7490; border: 1px solid #a5f3fc; }
+.cat-gray    { background-color: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
+
+/* ==========================================================================
+   FORMULAIRE ET MODAL FINTECH
+   ========================================================================== */
+.fintech-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px;
+}
+
+/* Toggle Switch Recette / Dépense */
+.type-toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 4px;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+}
+
+.type-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #64748b;
+  transition: all 0.15s ease;
+}
+
+.type-toggle-btn.btn-depense.active {
+  background-color: #ffffff;
+  color: #be123c;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.type-toggle-btn.btn-recette.active {
+  background-color: #ffffff;
+  color: #15803d;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Champs de saisie stylisés */
+.input-group-styled {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.input-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+}
+
+.styled-input {
+  width: 100%;
+  padding: 9px 12px 9px 36px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.styled-input:focus {
+  border-color: #2563eb;
+}
+
+.highlight .styled-input {
+  border-color: #93c5fd;
+  background-color: #f8fafc;
+}
+
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Puces pour les catégories */
+.category-pills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cat-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cat-pill-btn.pill-rose.active {
+  background-color: #be123c;
+  color: #ffffff;
+  border-color: #be123c;
+}
+
+.cat-pill-btn.pill-emerald.active {
+  background-color: #15803d;
+  color: #ffffff;
+  border-color: #15803d;
+}
+
+/* Puces pour les modes de paiement */
+.payment-pills-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.payment-pill-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.payment-pill-btn.active {
+  background-color: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  font-weight: 600;
+}
+
+/* Boutons d'action */
+.btn-primary-fintech {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: #0f172a;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-primary-fintech:hover {
+  background-color: #1e293b;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: #ffffff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  cursor: pointer;
+}
+
+.modal-actions-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+
+.kpi-grid-5 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-icon-wrapper.amber {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.kpi-icon-wrapper.indigo {
+  background-color: #e0e7ff;
+  color: #4f46e5;
+}
+
+.text-amber { color: #d97706; }
+.text-indigo { color: #4f46e5; }
+
+/* ==========================================
+   RESPONSIVE GLOBAL - MOBILE
+   ========================================== */
+@media (max-width: 768px) {
+  .kpi-grid,
+  .skeleton-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-title-group {
+    width: 100%;
+  }
+
+  .card-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  table th,
+  table td {
+    padding: 12px 14px !important;
+    font-size: 13px;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-table-action {
+    padding: 8px 12px;
+    font-size: 12.5px;
+  }
+
+  .modal {
+    max-width: 100%;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .capacity-cell {
+    width: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar h1 {
+    font-size: 15px;
+  }
+
+  .topbar {
+    padding: 0 14px;
+  }
+
+  .kpi-value {
+    font-size: 18px;
+  }
+}

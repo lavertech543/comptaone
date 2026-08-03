@@ -1,0 +1,130 @@
+/* ==========================================================================
+   CHAMPS DE SAISIE ÉLÉGANTS & HAUTE DENSITÉ
+   ========================================================================== */
+
+/* Style de base des champs */
+.styled-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem 0.55rem 2.3rem;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  background-color: #ffffff;
+  color: #0f172a;
+  font-family: 'Times New Roman', 'Courier New', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  transition: all 0.15s ease-in-out;
+  box-sizing: border-box;
+}
+
+/* Typographie technique pour les données chiffrées */
+.styled-input.font-mono {
+  font-family: 'Times New Roman', 'Courier New', monospace;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+/* Placeholder subtil et raffiné */
+.styled-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+/* État Focus raffiné (Halo discret FinTech) */
+.styled-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  background-color: #ffffff;
+}
+
+/* Libellés des champs */
+.input-label {
+  display: block;
+  font-size: 0.775rem;
+  font-family: 'Times New Roman', 'Courier New', monospace;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.35rem;
+  letter-spacing: -0.01em;
+}
+
+/* Unités (FCFA, %, jours) au propre */
+.input-unit {
+  position: absolute;
+  right: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: #64748b;
+  pointer-events: none;
+  background-color: #ffffff;
+  padding-left: 0.25rem;
+}
+
+/* ==========================================
+   RESPONSIVE GLOBAL - MOBILE
+   ========================================== */
+@media (max-width: 768px) {
+  .kpi-grid,
+  .skeleton-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-title-group {
+    width: 100%;
+  }
+
+  .card-panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  table th,
+  table td {
+    padding: 12px 14px !important;
+    font-size: 13px;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-table-action {
+    padding: 8px 12px;
+    font-size: 12.5px;
+  }
+
+  .modal {
+    max-width: 100%;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .capacity-cell {
+    width: 90px;
+  }
+}
+
+@media (max-width: 480px) {
+  .topbar h1 {
+    font-size: 15px;
+  }
+
+  .topbar {
+    padding: 0 14px;
+  }
+
+  .kpi-value {
+    font-size: 18px;
+  }
+}
