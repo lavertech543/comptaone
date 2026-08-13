@@ -74,7 +74,7 @@ async function seed() {
 
 
   // Utilisateurs (un par rôle)
-  const admin = await makeUser('admin', 'Administrateur N&K', 'admin', 'Admin@2026', 'admin@nk-avicole.local');
+  const admin = await makeUser('admin', 'Admin', 'admin', 'Admin@2026', 'admin@nk-avicole.local');
   await makeUser('production', 'Jean Éleveur', 'production', 'Prod@2026', null);
   await makeUser('magasin', 'Awa Magasinière', 'magasinier', 'Stock@2026', null);
   await makeUser('comptable', 'Paul Comptable', 'comptable', 'Compta@2026', 'compta@nk-avicole.local');
@@ -92,8 +92,8 @@ async function seed() {
   const params = [
     ['devise','FCFA'],['langue','fr'],['seuil_tresorerie','200000'],
     ['rappel_creance_jours','5'],['rappel_salaire_jours','3'],
-    ['entreprise_nom','N&K SARL — Ferme avicole'],
-    ['entreprise_adresse','Ferme avicole N&K SARL'],
+    ['entreprise_nom','ComptaOne SARL — Ferme avicole'],
+    ['entreprise_adresse','Ferme avicole ComptaOne SARL'],
     ['mortalite_seuil_pct','5']
   ];
   for (const [k,v] of params) {

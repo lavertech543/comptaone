@@ -22,7 +22,7 @@ const SETTING_SECTIONS = [
     title: 'Identité & Entreprise',
     icon: Building2,
     fields: [
-      { key: 'entreprise_nom', label: 'Nom de l’entreprise', icon: Building2, type: 'text', placeholder: 'ex: N&K SARL' },
+      { key: 'entreprise_nom', label: 'Nom de l’entreprise', icon: Building2, type: 'text', placeholder: 'ex: ComptaOne SARL' },
       { key: 'entreprise_adresse', label: 'Adresse physique / Siège', icon: MapPin, type: 'text', placeholder: 'ex: Douala, Cameroun' },
       { key: 'devise', label: 'Devise principale', icon: Coins, type: 'text', isMono: true, placeholder: 'ex: FCFA' },
     ]

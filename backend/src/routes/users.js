@@ -108,7 +108,7 @@ router.post('/', requirePermission(M, 'create'), async (req, res) => {
       await sendMail(
         newUser.email,
         '[N&K] Activez votre compte',
-        `Bonjour ${newUser.full_name},\n\nVotre compte a été créé sur la plateforme N&K SARL.\n\nVotre matricule : ${matricule}\n\nPour activer votre compte, définissez votre mot de passe via ce lien (valable 48h) :\n${setupLink}\n\nUne fois votre mot de passe défini, connectez-vous avec votre matricule.`
+        `Bonjour ${newUser.full_name},\n\nVotre compte a été créé sur la plateforme ComptaOne SARL.\n\nVotre matricule : ${matricule}\n\nPour activer votre compte, définissez votre mot de passe via ce lien (valable 48h) :\n${setupLink}\n\nUne fois votre mot de passe défini, connectez-vous avec votre matricule.`
       );
     } catch (mailErr) {
       console.error('Erreur envoi email activation:', mailErr);
@@ -261,7 +261,7 @@ router.post('/:id/resend-activation', requirePermission(M, 'edit'), async (req, 
 
     await sendMail(
       user.email,
-      '[N&K] Activez votre compte',
+      'Activation de  votre compte',
       `Bonjour ${user.full_name},\n\nVoici un nouveau lien pour activer votre compte N&K SARL.\n\nVotre matricule : ${user.matricule}\n\nDéfinissez votre mot de passe via ce lien (valable 48h) :\n${setupLink}\n\nUne fois votre mot de passe défini, connectez-vous avec votre matricule.`
     );
 

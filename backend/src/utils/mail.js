@@ -14,7 +14,7 @@ export async function sendMail(to, subject, text) {
   if (!transporter || !to) return; // e-mail optionnel
   try {
     await transporter.sendMail({
-      from: `"N&K SARL" <${process.env.MAIL_FROM}>`,
+      from: `"ComptaOne SARL" <${process.env.MAIL_FROM}>`,
       to,
       subject,
       text

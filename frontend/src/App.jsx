@@ -15,6 +15,7 @@ import Transactions from './pages/Transactions.jsx';
 import Accounting from './pages/Accounting.jsx';
 import Receivables from './pages/Receivables.jsx';
 import Salaries from './pages/Salaries.jsx';
+import './tek.css';
 import Corrections from './pages/Corrections.jsx';
 import Audit from './pages/Audit.jsx';
 import User from './pages/Users.jsx';
@@ -101,7 +102,7 @@ function Layout({ children }) {
       <aside className={'sidebar' + (open ? ' open' : '')}>
         <div className="brand">
           <img src={logoNk} alt="N&K SARL" className="sidebar-logo-img" />
-          <span className='login-header sub'>N&K sarl</span>
+          <span className='login-header sub'>ComptaOne</span>
        </div>
         <nav>
           {visible.map(m => {

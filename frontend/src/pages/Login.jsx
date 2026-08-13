@@ -1,14 +1,16 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
-import { User, Lock, LogIn, AlertCircle, Info } from 'lucide-react';
+import { User, Lock, LogIn, AlertCircle, Info, Eye, EyeOff } from 'lucide-react';
 
 import logoNk from './photo.png';
+import frame from './ip.png';
 import './Login.css'; // Importation de ton fichier CSS responsive
 
 export default function Login() {
   const { login, notice } = useAuth();
   const [username, setU] = useState('');
   const [password, setP] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // État pour la visibilité
   const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
 
@@ -31,8 +33,8 @@ export default function Login() {
         
         {/* En-tête avec Logo */}
         <div className="login-header">
-          <img src={logoNk} alt="N&K SARL Logo" className="login-logo" />
-          <h2>N&K SARL</h2>
+          <img src={frame} alt="N&K SARL Logo" className="login-logo" />
+          <h2>ComptaOne</h2>
           <p className="sub">Portail de gestion & comptabilité</p>
         </div>
 
@@ -74,12 +76,20 @@ export default function Login() {
               <Lock size={18} className="input-icon" />
               <input 
                 id="password"
-                type="password" 
+                type={showPassword ? "text" : "password"} 
                 value={password} 
                 onChange={e => setP(e.target.value)} 
                 placeholder="••••••••"
                 required 
               />
+              <button 
+                type="button" 
+                className="btn-toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 
@@ -96,7 +106,7 @@ export default function Login() {
         </form>
 
         <footer className="login-footer">
-          <p>© {new Date().getFullYear()} N&K SARL • Tous droits réservés</p>
+          <p>© {new Date().getFullYear()} ComptaOne • Tous droits réservés</p>
         </footer>
 
       </div>

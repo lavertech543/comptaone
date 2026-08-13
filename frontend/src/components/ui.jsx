@@ -1,24 +1,19 @@
 import { useState } from 'react';
 import { Inbox } from 'lucide-react';
-import './asc.css'
-
-
+import './asc.css';
 
 export function Modal({ title, onClose, children, footer }) {
   return (
-    <>
-      <style>{MODAL_CSS}</style>
-      <div className="overlay" onClick={onClose}>
-        <div className="modal" onClick={e => e.stopPropagation()}>
-          <div className="modal-head">
-            <div className="modal-title">{title}</div>
-            <button className="modal-close-btn" onClick={onClose}>✕</button>
-          </div>
-          <div className="modal-body">{children}</div>
-          {footer && <div className="modal-foot">{footer}</div>}
+    <div className="overlay" onClick={onClose}>
+      <div className="modal" onClick={e => e.stopPropagation()}>
+        <div className="modal-head">
+          <div className="modal-title">{title}</div>
+          <button className="modal-close-btn" onClick={onClose}>✕</button>
         </div>
+        <div className="modal-body">{children}</div>
+        {footer && <div className="modal-foot">{footer}</div>}
       </div>
-    </>
+    </div>
   );
 }
 

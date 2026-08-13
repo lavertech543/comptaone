@@ -33,8 +33,8 @@
 }
 
 .login-logo {
-  height: 64px;
-  width: auto;
+  height: 84px;
+  width: 300px;
   object-fit: contain;
   margin-bottom: 0.5rem;
 }
@@ -387,4 +387,32 @@
   .sp-card h2 {
     font-size: 1.25rem;
   }
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.btn-toggle-password {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280; /* Couleur discrète pour l'icône */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.btn-toggle-password:hover {
+  color: #111827; /* Icône plus sombre au survol */
+}
+
+/* On s'assure que le texte du mot de passe ne passe pas sous le bouton */
+.input-wrapper input {
+  padding-right: 40px; 
 }
