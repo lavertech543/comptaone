@@ -3,34 +3,34 @@ import { pool } from './pool.js';
 
 // Modules du système (chapitre 6)
 export const MODULES = [
-  'utilisateurs','batiments','bandes','production','alimentation','mortalite',
-  'sanitaire','stocks','achats','ventes','depenses','comptabilite','creances',
-  'salaires','rapports','audit','corrections'
+  'utilisateurs', 'batiments', 'bandes', 'production', 'alimentation', 'mortalite',
+  'sanitaire', 'stocks', 'achats', 'ventes', 'depenses', 'comptabilite', 'creances',
+  'salaires', 'rapports', 'audit', 'corrections'
 ];
 
 // Permissions par défaut selon la matrice rôles × modules (chapitre 6)
 // ● complet = toutes actions ; ◐ partiel = view (+print/export) ; — = aucun
-const FULL   = { v:1,c:1,e:1,d:1,p:1,x:1 };
-const READ   = { v:1,c:0,e:0,d:0,p:1,x:1 };
-const NONE   = { v:0,c:0,e:0,d:0,p:0,x:0 };
-const CREATE = { v:1,c:1,e:0,d:0,p:1,x:0 }; // saisie sans modif/suppr (verrouillage)
+const FULL = { v: 1, c: 1, e: 1, d: 1, p: 1, x: 1 };
+const READ = { v: 1, c: 0, e: 0, d: 0, p: 1, x: 1 };
+const NONE = { v: 0, c: 0, e: 0, d: 0, p: 0, x: 0 };
+const CREATE = { v: 1, c: 1, e: 0, d: 0, p: 1, x: 0 }; // saisie sans modif/suppr (verrouillage)
 
 const MATRIX = {
   admin: Object.fromEntries(MODULES.map(m => [m, FULL])),
   production: {
-    batiments:READ, bandes:READ, production:CREATE, alimentation:CREATE, mortalite:CREATE,
-    sanitaire:CREATE, stocks:READ, rapports:READ
+    batiments: READ, bandes: READ, production: CREATE, alimentation: CREATE, mortalite: CREATE,
+    sanitaire: CREATE, stocks: READ, rapports: READ
   },
   magasinier: {
-    alimentation:READ, sanitaire:READ, stocks:FULL, achats:READ, rapports:READ
+    alimentation: READ, sanitaire: READ, stocks: FULL, achats: READ, rapports: READ
   },
   comptable: {
-    stocks:READ, achats:FULL, ventes:FULL, depenses:FULL, comptabilite:READ,
-    creances:READ, salaires:FULL, rapports:FULL
+    stocks: READ, achats: FULL, ventes: FULL, depenses: FULL, comptabilite: READ,
+    creances: READ, salaires: FULL, rapports: FULL
   },
   responsable: {
-    batiments:READ, bandes:READ, production:READ, alimentation:READ, mortalite:READ,
-    sanitaire:READ, stocks:READ, comptabilite:READ, rapports:READ
+    batiments: READ, bandes: READ, production: READ, alimentation: READ, mortalite: READ,
+    sanitaire: READ, stocks: READ, comptabilite: READ, rapports: READ
   }
 };
 
@@ -90,21 +90,21 @@ async function seed() {
 
   // Paramètres
   const params = [
-    ['devise','FCFA'],['langue','fr'],['seuil_tresorerie','200000'],
-    ['rappel_creance_jours','5'],['rappel_salaire_jours','3'],
-    ['entreprise_nom','ComptaOne SARL — Ferme avicole'],
-    ['entreprise_adresse','Ferme avicole ComptaOne SARL'],
-    ['mortalite_seuil_pct','5']
+    ['devise', 'FCFA'], ['langue', 'fr'], ['seuil_tresorerie', '200000'],
+    ['rappel_creance_jours', '5'], ['rappel_salaire_jours', '3'],
+    ['entreprise_nom', 'ComptaOne SARL — Ferme avicole'],
+    ['entreprise_adresse', 'Ferme avicole ComptaOne SARL'],
+    ['mortalite_seuil_pct', '5']
   ];
-  for (const [k,v] of params) {
+  for (const [k, v] of params) {
     await pool.query(`INSERT INTO settings(cle,valeur) VALUES($1,$2)
-      ON CONFLICT(cle) DO UPDATE SET valeur=$2`, [k,v]);
+      ON CONFLICT(cle) DO UPDATE SET valeur=$2`, [k, v]);
   }
 
   // Bâtiments
-  const b1 = (await pool.query(`INSERT INTO buildings(nom,capacite,statut,created_by) VALUES('Poulailler A',5000,'en_production',$1) RETURNING id`,[admin])).rows[0].id;
-  const b2 = (await pool.query(`INSERT INTO buildings(nom,capacite,statut,created_by) VALUES('Poulailler B',3000,'en_production',$1) RETURNING id`,[admin])).rows[0].id;
-  await pool.query(`INSERT INTO buildings(nom,capacite,statut,created_by) VALUES('Poulailler C',3000,'nettoye',$1)`,[admin]);
+  const b1 = (await pool.query(`INSERT INTO buildings(nom,capacite,statut,created_by) VALUES('Poulailler A',5000,'en_production',$1) RETURNING id`, [admin])).rows[0].id;
+  const b2 = (await pool.query(`INSERT INTO buildings(nom,capacite,statut,created_by) VALUES('Poulailler B',3000,'en_production',$1) RETURNING id`, [admin])).rows[0].id;
+  await pool.query(`INSERT INTO buildings(nom,capacite,statut,created_by) VALUES('Poulailler C',3000,'nettoye',$1)`, [admin]);
 
   // Bandes
   const bd1 = (await pool.query(
@@ -118,39 +118,39 @@ async function seed() {
 
   // Production
   await pool.query(`INSERT INTO feedings(band_id,date_op,type_aliment,quantite_kg,created_by) VALUES
-    ($1,'2026-05-05','Démarrage',450,$3),($1,'2026-05-20','Croissance',900,$3),($2,'2026-06-15','Démarrage',300,$3)`,[bd1,bd2,admin]);
+    ($1,'2026-05-05','Démarrage',450,$3),($1,'2026-05-20','Croissance',900,$3),($2,'2026-06-15','Démarrage',300,$3)`, [bd1, bd2, admin]);
   await pool.query(`INSERT INTO mortalities(band_id,date_op,nombre,cause,created_by) VALUES
-    ($1,'2026-05-06',35,'Stress transport',$3),($1,'2026-05-25',12,'Inconnue',$3),($2,'2026-06-16',20,'Stress transport',$3)`,[bd1,bd2,admin]);
+    ($1,'2026-05-06',35,'Stress transport',$3),($1,'2026-05-25',12,'Inconnue',$3),($2,'2026-06-16',20,'Stress transport',$3)`, [bd1, bd2, admin]);
   await pool.query(`INSERT INTO treatments(band_id,date_op,produit,type,dose,created_by) VALUES
-    ($1,'2026-05-03','Vaccin Newcastle','vaccin','1 dose/sujet',$3),($2,'2026-06-12','Vaccin Gumboro','vaccin','1 dose/sujet',$3)`,[bd1,bd2,admin]);
+    ($1,'2026-05-03','Vaccin Newcastle','vaccin','1 dose/sujet',$3),($2,'2026-06-12','Vaccin Gumboro','vaccin','1 dose/sujet',$3)`, [bd1, bd2, admin]);
 
   // Produits & stocks
   const p1 = (await pool.query(`INSERT INTO products(nom,categorie,unite,quantite,seuil_min) VALUES('Aliment démarrage','aliment','kg',1200,500) RETURNING id`)).rows[0].id;
   const p2 = (await pool.query(`INSERT INTO products(nom,categorie,unite,quantite,seuil_min) VALUES('Aliment croissance','aliment','kg',300,500) RETURNING id`)).rows[0].id;
   await pool.query(`INSERT INTO products(nom,categorie,unite,quantite,seuil_min) VALUES('Vaccin Newcastle','vaccin','flacon',40,20)`);
   await pool.query(`INSERT INTO stock_movements(product_id,date_op,sens,quantite,motif,created_by) VALUES
-    ($1,'2026-05-01','entree',1650,'Achat initial',$2),($1,'2026-05-05','sortie',450,'Distribution bande 01',$2)`,[p1,admin]);
+    ($1,'2026-05-01','entree',1650,'Achat initial',$2),($1,'2026-05-05','sortie',450,'Distribution bande 01',$2)`, [p1, admin]);
 
   // Achats
   await pool.query(`INSERT INTO purchases(date_op,fournisseur,description,categorie,quantite,prix_unitaire,montant_total,mode_paiement,band_id,exercice_id,created_by) VALUES
     ('2026-05-01','Provendier SA','Aliment démarrage','aliment',1650,320,528000,'Espèces',$1,$2,$3),
-    ('2026-05-02','Pharmavet','Vaccins et médicaments','sanitaire',1,150000,150000,'Virement',$1,$2,$3)`,[bd1,exId,admin]);
+    ('2026-05-02','Pharmavet','Vaccins et médicaments','sanitaire',1,150000,150000,'Virement',$1,$2,$3)`, [bd1, exId, admin]);
 
   // Ventes
   const s1 = (await pool.query(`INSERT INTO sales(date_op,client,band_id,quantite,poids_kg,prix_unitaire,montant_total,mode_paiement,a_credit,exercice_id,created_by)
-    VALUES('2026-07-05','Restaurant Le Palmier',$1,500,900,2500,1250000,'Crédit',TRUE,$2,$3) RETURNING id`,[bd1,exId,admin])).rows[0].id;
+    VALUES('2026-07-05','Restaurant Le Palmier',$1,500,900,2500,1250000,'Crédit',TRUE,$2,$3) RETURNING id`, [bd1, exId, admin])).rows[0].id;
   await pool.query(`INSERT INTO sales(date_op,client,band_id,quantite,poids_kg,prix_unitaire,montant_total,mode_paiement,exercice_id,created_by)
-    VALUES('2026-07-10','Marché central',$1,300,540,2600,780000,'Espèces',$2,$3)`,[bd1,exId,admin]);
+    VALUES('2026-07-10','Marché central',$1,300,540,2600,780000,'Espèces',$2,$3)`, [bd1, exId, admin]);
 
   // Créance liée à la vente à crédit
   await pool.query(`INSERT INTO receivables(client,sale_id,montant,montant_paye,date_creation,date_echeance,statut,created_by)
-    VALUES('Restaurant Le Palmier',$1,1250000,250000,'2026-07-05','2026-07-25','partiel',$2)`,[s1,admin]);
+    VALUES('Restaurant Le Palmier',$1,1250000,250000,'2026-07-05','2026-07-25','partiel',$2)`, [s1, admin]);
 
   // Dépenses / recettes
   await pool.query(`INSERT INTO transactions(type,date_op,montant,categorie,motif,tiers,mode_paiement,exercice_id,created_by) VALUES
     ('depense','2026-05-10',75000,'Énergie','Facture électricité','SENELEC','Virement',$1,$2),
     ('depense','2026-06-01',40000,'Eau','Facture eau','Régie','Espèces',$1,$2),
-    ('recette','2026-07-12',60000,'Fumier','Vente de fumier','Maraîcher local','Espèces',$1,$2)`,[exId,admin]);
+    ('recette','2026-07-12',60000,'Fumier','Vente de fumier','Maraîcher local','Espèces',$1,$2)`, [exId, admin]);
 
   // Employés & salaires
   const e1 = (await pool.query(`INSERT INTO employees(nom,poste,salaire_ref,date_entree,statut) VALUES('Ibrahima Sow','Ouvrier avicole',90000,'2026-01-15','actif') RETURNING id`)).rows[0].id;
@@ -158,10 +158,9 @@ async function seed() {
   await pool.query(`INSERT INTO salary_payments(employee_id,periode,montant,date_paiement,mode_paiement,statut,exercice_id,created_by) VALUES
     ($1,'2026-06',90000,'2026-06-30','Espèces','paye',$3,$4),
     ($2,'2026-06',75000,'2026-06-30','Espèces','paye',$3,$4),
-    ($1,'2026-07',90000,NULL,NULL,'en_attente',$3,$4)`,[e1,e2,exId,admin]);
+    ($1,'2026-07',90000,NULL,NULL,'en_attente',$3,$4)`, [e1, e2, exId, admin]);
 
-  console.log('✅ Données de démonstration insérées.');
-  console.log('   Comptes: admin/Admin@2026, production/Prod@2026, magasin/Stock@2026, comptable/Compta@2026, responsable/Resp@2026');
+
   await pool.end();
 }
 

@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import argon2 from 'argon2';
 import crypto from 'crypto';
-import { query } from '../db/pool.js';
+import { query, tx } from '../db/pool.js';
 import { authRequired } from '../middleware/auth.js';
 import { requirePermission } from '../middleware/permissions.js';
 import { logAudit } from '../utils/audit.js';
-import { sendMail } from '../utils/mail.js';
+import { sendMailBackground } from '../utils/mail.js';
 
 const router = Router();
 const M = 'users';
@@ -49,10 +49,10 @@ router.get('/:id', requirePermission(M, 'view'), async (req, res) => {
   }
 });
 
-// --- HELPERS ---
+// VULN-18 FIX: Génération cryptographiquement sûre de matricule avec 6 chiffres aléatoires
 function generateMatricule(prefix = 'NK') {
   const year = new Date().getFullYear();
-  const randomDigits = Math.floor(1000 + Math.random() * 9000);
+  const randomDigits = crypto.randomInt(100000, 999999);
   return `${prefix}-${year}-${randomDigits}`;
 }
 
@@ -102,19 +102,37 @@ router.post('/', requirePermission(M, 'create'), async (req, res) => {
       console.error('Erreur audit:', auditErr);
     }
 
-    const setupLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/set-password?token=${setupToken}`;
-
+    // Enregistrement automatique comme employé (si pas déjà existant avec le même nom)
     try {
-      await sendMail(
-        newUser.email,
-        '[N&K] Activez votre compte',
-        `Bonjour ${newUser.full_name},\n\nVotre compte a été créé sur la plateforme ComptaOne SARL.\n\nVotre matricule : ${matricule}\n\nPour activer votre compte, définissez votre mot de passe via ce lien (valable 48h) :\n${setupLink}\n\nUne fois votre mot de passe défini, connectez-vous avec votre matricule.`
+      const empExists = await query(
+        'SELECT id FROM employees WHERE nom = $1',
+        [full_name]
       );
-    } catch (mailErr) {
-      console.error('Erreur envoi email activation:', mailErr);
+      if (empExists.rows.length === 0) {
+        const salaire_ref = Number(req.body.salaire_ref) || 0;
+        await query(
+          `INSERT INTO employees (nom, poste, email, salaire_ref, date_entree, statut, created_at)
+           VALUES ($1, $2, $3, $4, CURRENT_DATE, 'actif', NOW())`,
+          [full_name, role, email, salaire_ref]
+        );
+      }
+    } catch (empErr) {
+      console.error('Erreur création employé automatique:', empErr);
     }
 
-    res.status(201).json(newUser);
+    const setupLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/set-password?token=${setupToken}`;
+
+    // Envoi d'email asynchrone non-bloquant (arrière-plan)
+    sendMailBackground(
+      newUser.email,
+      '[ComptaOne SARL] Activez votre compte utilisateur',
+      `Bonjour ${newUser.full_name},\n\nVotre compte a été créé avec succès sur la plateforme ComptaOne SARL.\n\nMatricule d'accès : ${matricule}\nRôle attribué : ${role}\n\nPour définir votre mot de passe et activer votre accès (valable 48h), cliquez sur le lien suivant :\n${setupLink}\n\nCordialement,\nDirection des Systèmes d'Information — ComptaOne SARL`
+    );
+
+    res.status(201).json({
+      ...newUser,
+      setup_link: setupLink
+    });
   } catch (err) {
     console.error('Erreur POST /api/users :', err);
     if (err.code === '23505') {
@@ -259,10 +277,10 @@ router.post('/:id/resend-activation', requirePermission(M, 'edit'), async (req, 
 
     const setupLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/set-password?token=${setupToken}`;
 
-    await sendMail(
+    sendMailBackground(
       user.email,
-      'Activation de  votre compte',
-      `Bonjour ${user.full_name},\n\nVoici un nouveau lien pour activer votre compte N&K SARL.\n\nVotre matricule : ${user.matricule}\n\nDéfinissez votre mot de passe via ce lien (valable 48h) :\n${setupLink}\n\nUne fois votre mot de passe défini, connectez-vous avec votre matricule.`
+      'Activation de votre compte',
+      `Bonjour ${user.full_name},\n\nVoici un nouveau lien pour activer votre compte ComptaOne SARL.\n\nVotre matricule : ${user.matricule}\n\nDéfinissez votre mot de passe via ce lien (valable 48h) :\n${setupLink}\n\nUne fois votre mot de passe défini, connectez-vous avec votre matricule.`
     );
 
     try {
@@ -275,6 +293,67 @@ router.post('/:id/resend-activation', requirePermission(M, 'edit'), async (req, 
   } catch (err) {
     console.error('Erreur POST /:id/resend-activation :', err);
     res.status(500).json({ error: "Erreur lors de l'envoi du nouveau lien" });
+  }
+});
+
+// --- 9. SUPPRIMER UN UTILISATEUR (admin uniquement) ---
+router.delete('/:id', requirePermission(M, 'delete'), async (req, res) => {
+  try {
+    if (req.user?.role !== 'admin') {
+      return res.status(403).json({ error: 'Seuls les administrateurs peuvent supprimer un utilisateur.' });
+    }
+
+    const { id } = req.params;
+
+    if (Number(id) === req.user.id) {
+      return res.status(400).json({ error: 'Vous ne pouvez pas supprimer votre propre compte.' });
+    }
+
+    const targetRes = await query('SELECT id, role, full_name FROM users WHERE id = $1', [id]);
+    if (targetRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    }
+    if (targetRes.rows[0].role === 'admin') {
+      return res.status(403).json({ error: 'Impossible de supprimer un compte administrateur.' });
+    }
+
+    const targetUser = targetRes.rows[0];
+
+    // Transaction atomique : détacher les clés étrangères des historiques puis supprimer l'utilisateur
+    await tx(async (c) => {
+      await c.query('UPDATE audit_log SET user_id = NULL WHERE user_id = $1', [id]);
+      await c.query('DELETE FROM permissions WHERE user_id = $1', [id]);
+      await c.query('UPDATE feedings SET created_by = NULL WHERE created_by = $1', [id]);
+      await c.query('UPDATE mortalities SET created_by = NULL WHERE created_by = $1', [id]);
+      await c.query('UPDATE treatments SET created_by = NULL WHERE created_by = $1', [id]);
+      await c.query('UPDATE sales SET created_by = NULL WHERE created_by = $1', [id]);
+      await c.query('UPDATE purchases SET created_by = NULL WHERE created_by = $1', [id]);
+      await c.query('UPDATE transactions SET created_by = NULL WHERE created_by = $1', [id]);
+      await c.query('UPDATE salary_payments SET created_by = NULL WHERE created_by = $1', [id]);
+      await c.query('UPDATE stock_movements SET created_by = NULL WHERE created_by = $1', [id]);
+      await c.query('UPDATE attachments SET uploaded_by = NULL WHERE uploaded_by = $1', [id]);
+      await c.query('UPDATE corrections SET requested_by = NULL WHERE requested_by = $1', [id]);
+      await c.query('UPDATE corrections SET reviewed_by = NULL WHERE reviewed_by = $1', [id]);
+
+      await c.query('DELETE FROM users WHERE id = $1', [id]);
+    });
+
+    try {
+      await logAudit({
+        user: req.user,
+        action: 'delete',
+        module: M,
+        recordId: Number(id),
+        details: `Suppression de l'utilisateur ${targetUser.full_name}`
+      });
+    } catch (auditErr) {
+      console.error('Erreur audit:', auditErr);
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Erreur DELETE /api/users/:id :', err);
+    res.status(500).json({ error: "Erreur lors de la suppression de l'utilisateur" });
   }
 });
 

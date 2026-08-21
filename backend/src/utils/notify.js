@@ -183,12 +183,28 @@ export async function runAlerts() {
     const seuilTreso = Number(await setting('seuil_tresorerie', '200000'));
     const treso = await computeTresorerie();
     if (treso < seuilTreso) {
-      await pushOrUpdate(
-        'tresorerie',
-        0,
-        `Trésorerie sous le seuil : ${treso.toLocaleString('fr-FR')} FCFA (seuil ${seuilTreso.toLocaleString('fr-FR')} FCFA)`,
-        'danger'
+      const msgTreso = `Trésorerie sous le seuil : ${treso.toLocaleString('fr-FR')} FCFA (seuil ${seuilTreso.toLocaleString('fr-FR')} FCFA)`;
+
+      // Vérifier si c'est une nouvelle alerte (pas encore en base) pour envoyer l'email
+      const existingTreso = await query(
+        "SELECT id, message FROM notifications WHERE type='tresorerie' AND reference_id=0 AND is_resolved=FALSE"
       );
+      const isNewTresoAlert = existingTreso.rows.length === 0 || existingTreso.rows[0].message !== msgTreso;
+
+      await pushOrUpdate('tresorerie', 0, msgTreso, 'danger');
+
+      // Envoi email aux admins uniquement si c'est une nouvelle alerte ou si le montant a changé
+      if (isNewTresoAlert) {
+        query(`SELECT email FROM users WHERE role='admin' AND email IS NOT NULL AND is_active=TRUE`)
+          .then((admins) => {
+            for (const a of admins.rows) {
+              sendMail(a.email, `[N&K] Alerte TRÉSORERIE`, msgTreso).catch((err) =>
+                console.error(`Erreur envoi mail trésorerie à ${a.email}:`, err)
+              );
+            }
+          })
+          .catch((err) => console.error('Erreur récupération admins (trésorerie):', err));
+      }
     } else {
       await query("UPDATE notifications SET is_resolved = TRUE, is_read = TRUE WHERE type = 'tresorerie' AND reference_id = 0");
     }

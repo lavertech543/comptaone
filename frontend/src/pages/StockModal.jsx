@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
 
-export default function StockModal({ isOpen, onClose, products = [], onSuccess }) {
+export default function StockModal({ isOpen, onClose, products = [], onSuccess, initialProductId = null }) {
   const initialState = {
     product_id: '',
     type: 'Entrée',
@@ -16,10 +16,14 @@ export default function StockModal({ isOpen, onClose, products = [], onSuccess }
 
   useEffect(() => {
     if (isOpen) {
-      setFormData(initialState);
+      const defaultId = initialProductId ? String(initialProductId) : (products.length > 0 ? String(products[0].id) : '');
+      setFormData({
+        ...initialState,
+        product_id: defaultId
+      });
       setError(null);
     }
-  }, [isOpen]);
+  }, [isOpen, initialProductId]);
 
   if (!isOpen) return null;
 

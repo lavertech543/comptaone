@@ -26,7 +26,8 @@ import {
   Lock,
   Receipt,
   UserPlus,
-  ArrowUpRight
+  ArrowUpRight,
+  Mail
 } from 'lucide-react';
 
 const PAYMENTS = [
@@ -549,6 +550,22 @@ function SalModal({ modal, emps, onClose, onSaved, setErr }) {
                   onChange={e => handleChange('nom', e.target.value)} 
                   placeholder="Ex: Jean Kouassi"
                   autoFocus
+                />
+              </div>
+            </div>
+
+            <div className="input-group-styled">
+              <label className="input-label">
+                Adresse email <span style={{fontWeight:'normal', color:'#94a3b8', fontSize:'11px'}}>(optionnel — reçoit la confirmation de paiement)</span>
+              </label>
+              <div className="input-icon-wrapper">
+                <Mail size={16} className="input-icon" />
+                <input 
+                  type="email" 
+                  className="styled-input"
+                  value={f.email || ''} 
+                  onChange={e => handleChange('email', e.target.value)} 
+                  placeholder="Ex: jean.kouassi@email.com"
                 />
               </div>
             </div>

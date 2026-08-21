@@ -201,6 +201,7 @@ CREATE TABLE IF NOT EXISTS employees (
   id            SERIAL PRIMARY KEY,
   nom           VARCHAR(120) NOT NULL,
   poste         VARCHAR(80),
+  email         VARCHAR(160),
   salaire_ref   NUMERIC(14,2) NOT NULL DEFAULT 0,
   date_entree   DATE,
   statut        VARCHAR(15) NOT NULL DEFAULT 'actif',  -- actif, inactif

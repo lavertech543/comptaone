@@ -8,12 +8,23 @@ import {
   TrendingUp, 
   Users, 
   Layers,
-  Sparkles
+  Sparkles,
+  Calendar
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { getToken } from '../api.js';
 
 const REPORTS = [
+  { 
+    id: 'daily',
+    path: 'daily.pdf', 
+    label: 'Rapport journalier d’activité', 
+    desc: 'Bilan complet du jour : alimentation, mortalité, soins, ventes, dépenses et stock.',
+    icon: Calendar,
+    badgeText: 'Quotidien',
+    badgeType: 'emerald',
+    hasDatePicker: true
+  },
   { 
     id: 'financial',
     path: 'financial.pdf', 
@@ -48,16 +59,15 @@ function ReportButton({ onClick, isLoading }) {
   const [hovered, setHovered] = useState(false);
   const [active, setActive] = useState(false);
 
-  // Styles dynamiques selon l'état du bouton
-  let backgroundColor = '#2563eb'; // Couleur par défaut
+  let backgroundColor = '#2563eb';
   let transform = 'none';
   let boxShadow = '0 1px 2px rgba(37, 99, 235, 0.2)';
 
   if (active) {
-    backgroundColor = '#1e3a8a'; // Couleur au clic (Bleu foncé)
+    backgroundColor = '#1e3a8a';
     transform = 'scale(0.98)';
   } else if (hovered) {
-    backgroundColor = '#1d4ed8'; // Couleur au survol
+    backgroundColor = '#1d4ed8';
     transform = 'translateY(-1px)';
     boxShadow = '0 4px 12px rgba(37, 99, 235, 0.35)';
   }
@@ -108,11 +118,16 @@ function ReportButton({ onClick, isLoading }) {
 export default function Reports() {
   const { can } = useAuth();
   const [loadingPath, setLoadingPath] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
 
-  async function handleOpenReport(path) {
+  async function handleOpenReport(path, hasDatePicker = false) {
     setLoadingPath(path);
+    const fullPath = hasDatePicker ? `${path}?date=${selectedDate}` : path;
+
     try {
-      const res = await fetch(`/api/reports/${path}`, {
+      const res = await fetch(`/api/reports/${fullPath}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
 
@@ -140,17 +155,17 @@ export default function Reports() {
   return (
     <div style={{ padding: '1.5rem', fontFamily: 'Inter, system-ui, sans-serif' }}>
       {/* HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <div style={{ padding: '0.6rem', backgroundColor: '#eff6ff', borderRadius: '0.75rem', color: '#2563eb' }}>
             <FileSpreadsheet size={22} />
           </div>
           <div>
             <h2 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#0f172a' }}>
-              Rapports & Exports
+              Rapports & Exports PDF
             </h2>
             <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b' }}>
-              Générez et téléchargez vos bilans d'activité au format PDF.
+              Générez et téléchargez vos bilans d'activité au format PDF officiel.
             </p>
           </div>
         </div>
@@ -170,15 +185,15 @@ export default function Reports() {
         color: '#475569'
       }}>
         <Sparkles size={16} style={{ color: '#2563eb', flexShrink: 0 }} />
-        <span><strong>Note d'impression :</strong> Les rapports sont générés avec en-tête, logo et pied de page officiels.</span>
+        <span><strong>Note d'impression :</strong> Les rapports sont générés avec en-tête officiel, indicateurs clés et sous-totaux dynamiques.</span>
       </div>
 
-      {/* GRILLE DES CARTES (Flexbox forcée sur toute la hauteur) */}
+      {/* GRILLE DES CARTES */}
       <div style={{ 
         display: 'grid', 
         gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
         gap: '1.25rem',
-        alignItems: 'stretch' // Force toutes les cartes de la ligne à avoir la même hauteur
+        alignItems: 'stretch'
       }}>
         {REPORTS.map((r) => {
           const IconComponent = r.icon;
@@ -193,8 +208,8 @@ export default function Reports() {
                 borderRadius: '0.85rem',
                 padding: '1.25rem',
                 display: 'flex',
-                flexDirection: 'column', // Disposition verticale pour pousser le bouton vers le bas
-                justify: 'space-between',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
               }}
             >
@@ -213,16 +228,39 @@ export default function Reports() {
                 <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '0.95rem', fontWeight: 700, color: '#0f172a' }}>
                   {r.label}
                 </h3>
-                <p style={{ margin: 0, fontSize: '0.825rem', color: '#64748b', lineHeight: '1.4', marginBottom: '1.5rem' }}>
+                <p style={{ margin: 0, fontSize: '0.825rem', color: '#64748b', lineHeight: '1.4', marginBottom: '1rem' }}>
                   {r.desc}
                 </p>
+
+                {/* Sélecteur de date si rapport journalier */}
+                {r.hasDatePicker && (
+                  <div style={{ marginBottom: '1rem', background: '#f8fafc', padding: '0.65rem 0.75rem', borderRadius: '0.5rem', border: '1px solid #e2e8f0' }}>
+                    <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: '600', color: '#475569', marginBottom: '0.35rem' }}>
+                      Sélectionner la date du rapport :
+                    </label>
+                    <input 
+                      type="date" 
+                      value={selectedDate} 
+                      onChange={e => setSelectedDate(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '0.45rem 0.65rem',
+                        borderRadius: '0.4rem',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.825rem',
+                        color: '#0f172a',
+                        backgroundColor: '#ffffff'
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* Zone bouton ALIGNÉE EN BAS via margin-top: auto */}
+              {/* Zone bouton ALIGNÉE EN BAS */}
               <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid #f1f5f9' }}>
                 {isAllowedToExport ? (
                   <ReportButton 
-                    onClick={() => handleOpenReport(r.path)} 
+                    onClick={() => handleOpenReport(r.path, r.hasDatePicker)} 
                     isLoading={isLoading} 
                   />
                 ) : (

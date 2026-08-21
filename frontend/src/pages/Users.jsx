@@ -16,10 +16,12 @@ import {
   Lock,
   Layers,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Trash2
 } from 'lucide-react';
 import { api } from '../api.js';
 import { Modal, Table, useForm } from '../components/ui.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
 import { fmtDateTime } from '../util.js';
 
 const ROLES = [
@@ -114,6 +116,50 @@ const USERS_ENHANCED_CSS = `
   box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
+.users-header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .users-header-actions {
+    flex-direction: row;
+    width: auto;
+  }
+}
+
+.btn-fintech-admin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.6rem;
+  border: 1px solid #5b21b6;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 1px 3px rgba(124, 58, 237, 0.25);
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .btn-fintech-admin {
+    width: auto;
+  }
+}
+
+.btn-fintech-admin:hover:not(:disabled) {
+  background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+}
+
 .btn-fintech-secondary {
   display: inline-flex;
   align-items: center;
@@ -134,6 +180,33 @@ const USERS_ENHANCED_CSS = `
   background-color: #f8fafc;
   border-color: #94a3b8;
   color: #0f172a;
+}
+
+.btn-fintech-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background-color: #ffffff;
+  color: #dc2626;
+  font-weight: 500;
+  font-size: 0.8rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #fecaca;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-fintech-danger:hover:not(:disabled) {
+  background-color: #fef2f2;
+  border-color: #f87171;
+  color: #b91c1c;
+}
+
+.btn-fintech-danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 /* Cartes Mobile Utilisateurs */
@@ -379,8 +452,10 @@ function RoleBadge({ role }) {
 }
 
 export default function User() {
+  const { user } = useAuth();
   const [rows, setRows] = useState([]);
   const [modal, setModal] = useState(null);
+  const [createdUserModal, setCreatedUserModal] = useState(null);
   const [perms, setPerms] = useState(null);
   const [err, setErr] = useState(null);
 
@@ -430,6 +505,21 @@ export default function User() {
     }
   }
 
+  async function deleteUser(u) {
+    const label = u.full_name || u.username || u.matricule;
+    if (!window.confirm(`Supprimer définitivement le compte « ${label} » ?\n\nCette action est irréversible.`)) return;
+
+    try {
+      await api.del(`/users/${u.id}`);
+      load();
+    } catch (e) {
+      setErr(e.message);
+    }
+  }
+
+  const isAdmin = user?.role === 'admin';
+  const canDeleteUser = (u) => isAdmin && u.id !== user?.id && u.role !== 'admin';
+
   return (
     <div className="users-wrapper" style={{ padding: '1.25rem', maxWidth: '1400px', margin: '0 auto' }}>
       <style>{USERS_ENHANCED_CSS}</style>
@@ -455,14 +545,18 @@ export default function User() {
           </div>
         </div>
 
-        <button 
-          type="button" 
-          className="btn-fintech-primary"
-          onClick={() => setModal({})}
-        >
-          <UserPlus size={16} />
-          <span>Nouvel utilisateur</span>
-        </button>
+        {user?.role === 'admin' && (
+          <div className="users-header-actions">
+            <button
+              type="button"
+              className="btn-fintech-admin"
+              onClick={() => setModal({})}
+            >
+              <ShieldCheck size={16} />
+              <span>Nouvel utilisateur</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {err && (
@@ -535,10 +629,6 @@ export default function User() {
                 <Shield size={13} style={{ color: '#2563eb' }} />
                 <span>Droits</span>
               </button>
-              <button type="button" className="btn-fintech-secondary" onClick={() => setModal(r)}>
-                <Edit3 size={13} style={{ color: '#475569' }} />
-                <span>Éditer</span>
-              </button>
               {!r.is_activated && r.email && (
                 <button type="button" className="btn-fintech-secondary" onClick={() => resendActivation(r)}>
                   <Mail size={13} style={{ color: '#0891b2' }} />
@@ -549,6 +639,12 @@ export default function User() {
                 <button type="button" className="btn-fintech-secondary" onClick={() => resetPw(r)}>
                   <KeyRound size={13} style={{ color: '#d97706' }} />
                   <span>MDP</span>
+                </button>
+              )}
+              {canDeleteUser(r) && (
+                <button type="button" className="btn-fintech-danger" onClick={() => deleteUser(r)}>
+                  <Trash2 size={13} />
+                  <span>Suppr.</span>
                 </button>
               )}
             </div>
@@ -593,10 +689,6 @@ export default function User() {
                   <Shield size={13} style={{ color: '#2563eb' }} />
                   <span>Droits</span>
                 </button>
-                <button type="button" className="btn-fintech-secondary" onClick={() => setModal(r)}>
-                  <Edit3 size={13} style={{ color: '#475569' }} />
-                  <span>Éditer</span>
-                </button>
                 {!r.is_activated && r.email && (
                   <button type="button" className="btn-fintech-secondary" onClick={() => resendActivation(r)}>
                     <Mail size={13} style={{ color: '#0891b2' }} />
@@ -609,14 +701,93 @@ export default function User() {
                     <span>MDP</span>
                   </button>
                 )}
+                {canDeleteUser(r) && (
+                  <button type="button" className="btn-fintech-danger" onClick={() => deleteUser(r)}>
+                    <Trash2 size={13} />
+                    <span>Supprimer</span>
+                  </button>
+                )}
               </div>
             </div>
           ))
         )}
       </div>
 
-      {modal && <UserModal item={modal} onClose={() => setModal(null)} onSaved={() => { setModal(null); load(); }} setErr={setErr} />}
+      {modal && (
+        <UserModal 
+          item={modal} 
+          onClose={() => setModal(null)} 
+          onSaved={(createdData) => { 
+            setModal(null); 
+            load(); 
+            if (createdData && createdData.setup_link) {
+              setCreatedUserModal(createdData);
+            }
+          }} 
+          setErr={setErr} 
+        />
+      )}
       {perms && <PermsModal data={perms} onClose={() => setPerms(null)} onSaved={() => setPerms(null)} setErr={setErr} />}
+
+      {createdUserModal && (
+        <Modal
+          title={
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#16a34a' }}>
+              <CheckCircle2 size={20} />
+              <span style={{ fontWeight: 700 }}>Compte utilisateur créé avec succès !</span>
+            </div>
+          }
+          onClose={() => setCreatedUserModal(null)}
+          footer={
+            <button 
+              type="button" 
+              className="btn-fintech-primary" 
+              onClick={() => setCreatedUserModal(null)}
+            >
+              Fermer
+            </button>
+          }
+        >
+          <div style={{ padding: '0.5rem 0', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{ padding: '0.85rem', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '0.6rem', fontSize: '0.875rem', color: '#15803d' }}>
+              📧 Un e-mail contenant les instructions a été déclenché en arrière-plan à destination de <strong>{createdUserModal.email}</strong>.
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>MATRICULE D'ACCÈS GÉNÉRÉ</span>
+              <div className="users-font-mono" style={{ padding: '0.6rem 0.8rem', backgroundColor: '#f1f5f9', borderRadius: '0.5rem', fontWeight: 700, fontSize: '1rem', color: '#0f172a' }}>
+                {createdUserModal.matricule || createdUserModal.username}
+              </div>
+            </div>
+
+            {createdUserModal.setup_link && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 600 }}>LIEN DIRECT D'ACTIVATION DU COMPTE</span>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <input
+                    type="text"
+                    readOnly
+                    value={createdUserModal.setup_link}
+                    className="users-font-mono"
+                    style={{ flex: 1, padding: '0.5rem 0.75rem', borderRadius: '0.5rem', border: '1px solid #cbd5e1', fontSize: '0.775rem', backgroundColor: '#f8fafc' }}
+                  />
+                  <button
+                    type="button"
+                    className="btn-fintech-secondary"
+                    style={{ fontSize: '0.775rem', whiteSpace: 'nowrap' }}
+                    onClick={() => {
+                      navigator.clipboard.writeText(createdUserModal.setup_link);
+                      alert('Lien d’activation copié dans le presse-papier !');
+                    }}
+                  >
+                    📋 Copier
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
@@ -629,6 +800,7 @@ function UserModal({ item, onClose, onSaved, setErr }) {
     full_name: item.full_name || '',
     email: item.email || '',
     role: item.role || 'production',
+    salaire_ref: item.salaire_ref || '',
     password: '',
     is_active: item.is_active ?? true
   });
@@ -638,9 +810,13 @@ function UserModal({ item, onClose, onSaved, setErr }) {
     if (e) e.preventDefault();
     setBusy(true);
     try {
-      if (isNew) await api.post('/users', f);
-      else await api.put(`/users/${item.id}`, f);
-      onSaved();
+      if (isNew) {
+        const resData = await api.post('/users', f);
+        onSaved(resData);
+      } else {
+        await api.put(`/users/${item.id}`, f);
+        onSaved();
+      }
     } catch (e) {
       setErr(e.message);
       setBusy(false);
@@ -740,19 +916,40 @@ function UserModal({ item, onClose, onSaved, setErr }) {
         </div>
 
         {isNew && (
-          <div className="field-group">
-            <label className="field-label">Mot de passe temporaire</label>
-            <div className="field-input-wrap">
-              <Lock size={16} className="field-icon" style={{ color: '#d97706' }} />
-              <input 
-                type="password" 
-                className="field-input" 
-                value={f.password} 
-                onChange={set('password')} 
-                placeholder="••••••••"
-              />
+          <>
+            <div className="field-group">
+              <label className="field-label">
+                Salaire mensuel de référence (FCFA)
+                <span style={{ fontWeight: 'normal', color: '#94a3b8', fontSize: '11px', marginLeft: '0.4rem' }}>(optionnel)</span>
+              </label>
+              <div className="field-input-wrap">
+                <span style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 600, pointerEvents: 'none' }}>FCFA</span>
+                <input 
+                  type="number"
+                  className="field-input users-font-mono"
+                  style={{ paddingLeft: '3.5rem' }}
+                  value={f.salaire_ref}
+                  onChange={set('salaire_ref')}
+                  placeholder="0"
+                  min="0"
+                />
+              </div>
             </div>
-          </div>
+
+            <div className="field-group">
+              <label className="field-label">Mot de passe temporaire</label>
+              <div className="field-input-wrap">
+                <Lock size={16} className="field-icon" style={{ color: '#d97706' }} />
+                <input 
+                  type="password" 
+                  className="field-input" 
+                  value={f.password} 
+                  onChange={set('password')} 
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+          </>
         )}
 
         {!isNew && (

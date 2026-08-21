@@ -1,7 +1,32 @@
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { query } from '../db/pool.js';
 
-const SECRET = process.env.JWT_SECRET || 'dev_secret';
+// VULN-02 FIX: Génération d'une clé aléatoire cryptographiquement sûre si aucune variable JWT_SECRET n'est fournie en dev.
+// En production, exige une variable JWT_SECRET de plus de 32 caractères.
+function getJwtSecret() {
+  const envSecret = process.env.JWT_SECRET;
+  const isProd = process.env.NODE_ENV === 'production';
+
+  if (isProd) {
+    if (!envSecret || envSecret === 'dev_secret' || envSecret.includes('change_this') || envSecret.length < 32) {
+      console.error('❌ ERREUR CRITIQUE DE SÉCURITÉ : La variable JWT_SECRET en production doit être définie et contenir au moins 32 caractères aléatoires.');
+    }
+    return envSecret || 'fallback_production_secret_key_needs_override_in_env_immediately';
+  }
+
+  if (!envSecret || envSecret === 'dev_secret') {
+    if (!global._devJwtSecret) {
+      global._devJwtSecret = crypto.randomBytes(32).toString('hex');
+      console.warn('⚠️ JWT_SECRET non défini en dev : génération automatique d’une clé aléatoire sécurisée pour la session.');
+    }
+    return global._devJwtSecret;
+  }
+
+  return envSecret;
+}
+
+const SECRET = getJwtSecret();
 const INACTIVITY_MS = Number(process.env.INACTIVITY_TIMEOUT_MIN || 30) * 60 * 1000;
 
 export function signToken(user) {

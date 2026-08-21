@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
+
 /* ==========================================================================
    PAGE SALES (VENTES & RECETTES) - CSS ULTRA-RESPONSIVE & FINTECH DESIGN
    ========================================================================== */
@@ -1632,9 +1634,6 @@ input:checked + .switch-slider:before {
    PAGE PARAMÈTRES / SETTINGS - TYPOGRAPHIE & DESIGN RESPONSIVE
    ========================================================================== */
 
-/* Import de polices modernes depuis Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
-
 :root {
   /* Polices personnalisables */
   --font-main: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; /* Structure & Titres */
@@ -1996,3 +1995,66 @@ input:checked + .switch-slider:before {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* ==========================================================================
+   OPTIMISATIONS RESPONSIVES GLOBALES (TABLES & MODAUX MOBILE)
+   ========================================================================== */
+
+.perms-desktop-view {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.perms-mobile-view {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .perms-desktop-view {
+    display: none !important;
+  }
+
+  .perms-mobile-view {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .perms-module-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 0.6rem;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  }
+
+  .perms-module-header {
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    user-select: none;
+  }
+
+  .perms-module-body {
+    padding: 0.85rem 1rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 0.75rem;
+    background: #ffffff;
+  }
+
+  /* Débordement sécurisé des tableaux sur petit écran */
+  .card-panel,
+  .table-responsive,
+  .fintech-card {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

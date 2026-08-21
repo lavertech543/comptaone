@@ -2,21 +2,21 @@ import { useEffect, useState } from 'react';
 import { api } from '../api.js';
 import { fmtFCFA, fmtNum, fmtDateTime } from '../util.js';
 import './dashboard.css'
-import { 
-  Building2, 
-  Bird, 
-  HeartPulse, 
-  TrendingUp, 
-  TrendingDown, 
-  Scale, 
-  Wallet, 
-  Landmark, 
-  Users, 
-  FileSpreadsheet, 
-  Bell, 
-  Check, 
-  AlertTriangle, 
-  AlertCircle, 
+import {
+  Building2,
+  Bird,
+  HeartPulse,
+  TrendingUp,
+  TrendingDown,
+  Scale,
+  Wallet,
+  Landmark,
+  Users,
+  FileSpreadsheet,
+  Bell,
+  Check,
+  AlertTriangle,
+  AlertCircle,
   Info,
   Clock,
   ShieldCheck,
@@ -31,15 +31,16 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       setRefreshing(true);
-      await api.post('/notifications/refresh').catch(() => {});
-      
+      await api.post('/notifications/refresh').catch(() => { });
+
       const data = await api.get('/dashboard');
-      
+
       if (data && Array.isArray(data.alertes)) {
         data.alertes = data.alertes.filter(a => !a.is_read && !a.is_resolved);
       }
 
       setD(data);
+      window.dispatchEvent(new Event('notifs:reload'));
     } catch (e) {
       setErr(e.message);
     } finally {
@@ -58,6 +59,7 @@ export default function Dashboard() {
         ...prev,
         alertes: prev.alertes ? prev.alertes.filter(a => a.id !== id) : []
       }));
+      window.dispatchEvent(new Event('notifs:reload'));
     } catch (e) {
       console.error('Erreur lors du marquage comme vu :', e);
     }
@@ -118,9 +120,9 @@ export default function Dashboard() {
           <h2>Aperçu général</h2>
           <p className="sub-text">Performances opérationnelles et financières en temps réel.</p>
         </div>
-        <button 
-          className="btn-secondary" 
-          onClick={loadDashboardData} 
+        <button
+          className="btn-secondary"
+          onClick={loadDashboardData}
           disabled={refreshing}
           title="Actualiser les alertes et données"
         >
@@ -231,7 +233,7 @@ export default function Dashboard() {
       </div>
 
       {/* 2. SECTION ALERTES */}
-      <div className="card-panel">
+      <div id="alertes-systeme" className="card-panel">
         <div className="card-panel-header">
           <div className="panel-title-group">
             <Bell size={20} className="panel-icon text-amber" />
@@ -261,8 +263,8 @@ export default function Dashboard() {
                     <td>{getSeveriteBadge(a.severite, a.type)}</td>
                     <td className="font-medium text-slate-800">{a.message}</td>
                     <td style={{ textAlign: 'right' }}>
-                      <button 
-                        className="btn-action-check" 
+                      <button
+                        className="btn-action-check"
                         onClick={() => markRead(a.id)}
                         title="Marquer comme vu"
                       >

@@ -4,6 +4,57 @@ import ProductModal from './ProductModal';
 import StockModal from './StockModal';
 import styles from './Stock.module.css';
 
+// --- Composants d'icônes SVG pour un rendu pro ---
+
+// Icône principale pour le titre "Stock & Inventaire" (Box/Package)
+const IconStockTitle = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+    <line x1="12" y1="22.08" x2="12" y2="12"/>
+  </svg>
+);
+
+const IconDownload = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+);
+
+const IconPlus = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+);
+
+const IconArrowsExchange = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 10l5-5 5 5"/><path d="M12 5v14"/><path d="M17 14l-5 5-5-5"/></svg>
+);
+
+const IconArchive = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+);
+
+const IconEdit = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+);
+
+const IconTrash = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+);
+
+const IconRefresh = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+);
+
+const IconAlertTriangle = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+);
+
+const IconArrowDown = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+);
+
+const IconArrowUp = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+);
+
 export default function Stock() {
   const [products, setProducts] = useState([]);
   const [movements, setMovements] = useState([]);
@@ -16,10 +67,15 @@ export default function Stock() {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [showArchived, setShowArchived] = useState(false);
 
-  // Modales
+  // Filtres spécifiques aux mouvements
+  const [movementSearch, setMovementSearch] = useState('');
+  const [movementSensFilter, setMovementSensFilter] = useState('ALL');
+
+  // Modales & Mouvement Rapide
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isMovementModalOpen, setIsMovementModalOpen] = useState(false);
   const [selectedProductToEdit, setSelectedProductToEdit] = useState(null);
+  const [quickProductId, setQuickProductId] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -57,6 +113,11 @@ export default function Stock() {
     setIsProductModalOpen(true);
   };
 
+  const handleOpenQuickMovement = (product) => {
+    setQuickProductId(product.id);
+    setIsMovementModalOpen(true);
+  };
+
   const checkHasHistory = (productId) => {
     return movements.some((m) => Number(m.product_id) === Number(productId));
   };
@@ -66,7 +127,7 @@ export default function Stock() {
 
     if (hasHistory) {
       const confirmArchive = window.confirm(
-        `⚠️ Impossible de supprimer définitivement "${product.nom}".\n\n` +
+        `Impossible de supprimer définitivement "${product.nom}".\n\n` +
         `Ce produit est lié à un historique de mouvements. Souhaitez-vous l'ARCHIVER ?`
       );
 
@@ -106,6 +167,33 @@ export default function Stock() {
     }
   };
 
+  // Exportation de l'inventaire en CSV
+  const exportCSV = () => {
+    if (filteredProducts.length === 0) {
+      alert("Aucun produit à exporter.");
+      return;
+    }
+    const headers = ["ID", "Nom", "Catégorie", "Quantité", "Unité", "Seuil Minimal", "Statut"];
+    const rowsData = filteredProducts.map(p => [
+      p.id,
+      `"${(p.nom || '').replace(/"/g, '""')}"`,
+      `"${(p.categorie || p.category || 'Général').replace(/"/g, '""')}"`,
+      p.quantite,
+      `"${p.unite || ''}"`,
+      p.seuil_min,
+      !p.is_active ? "Archivé" : (p.alerte ? "Stock Bas" : "En Stock")
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(";"), ...rowsData.map(e => e.join(";"))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `inventaire_stock_NK_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Filtrage des Produits
   const filteredProducts = products.filter((p) => {
     const productName = p.nom ? p.nom.toLowerCase() : '';
     const matchesSearch = productName.includes(search.toLowerCase());
@@ -117,33 +205,70 @@ export default function Stock() {
     return matchesSearch && matchesCategory && matchesArchiveState;
   });
 
+  // Filtrage des Mouvements
+  const filteredMovements = movements.filter((m) => {
+    const productName = m.produit ? m.produit.toLowerCase() : '';
+    const motif = m.motif ? m.motif.toLowerCase() : '';
+    const term = movementSearch.toLowerCase();
+    const matchesSearch = productName.includes(term) || motif.includes(term);
+    const matchesSens = movementSensFilter === 'ALL' || m.sens === movementSensFilter;
+    return matchesSearch && matchesSens;
+  });
+
   const totalProducts = products.filter((p) => Boolean(p.is_active)).length;
   const alertProducts = products.filter((p) => Boolean(p.is_active) && Boolean(p.alerte)).length;
+  const totalEntreesCount = movements.filter(m => m.sens === 'entree').length;
+  const totalSortiesCount = movements.filter(m => m.sens === 'sortie').length;
+
+  const getStockHealthPercent = (qty, min) => {
+    if (!min || min <= 0) return Math.min(100, Math.max(10, qty * 10));
+    const ratio = (qty / (min * 2)) * 100;
+    return Math.min(100, Math.max(5, Math.round(ratio)));
+  };
 
   return (
     <div className={styles.stockPage}>
-      {/* En-tête */}
+      {/* En-tête avec SVG du titre */}
       <div className={styles.stockHeader}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800', color: '#111827' }}>Stock & Inventaire</h1>
-          <p style={{ margin: '4px 0 0 0', color: '#6b7280', fontSize: '0.875rem' }}>
-            Suivi en temps réel des aliments, produits de santé et équipements
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '42px',
+              height: '42px',
+              backgroundColor: '#eff6ff',
+              borderRadius: '10px',
+              border: '1px solid #bfdbfe'
+            }}>
+              <IconStockTitle />
+            </div>
+            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: '800', color: '#111827' }}>
+              Stock & Inventaire
+            </h1>
+          </div>
+          <p style={{ margin: '6px 0 0 0', color: '#6b7280', fontSize: '0.875rem' }}>
+            Suivi automatisé en temps réel des intrants, alimentation et produits vétérinaires N&K SARL
           </p>
         </div>
         <div className={styles.stockHeaderActions}>
-          <button className={styles.btnSecondary} onClick={() => setIsMovementModalOpen(true)}>
-            ± Mouvement de stock
+          <button className={styles.btnSecondary} onClick={exportCSV} title="Exporter l'inventaire en CSV" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <IconDownload /> Exporter CSV
           </button>
-          <button className={styles.btnPrimary} onClick={handleOpenCreateModal}>
-            + Nouveau Produit
+          <button className={styles.btnSecondary} onClick={() => { setQuickProductId(null); setIsMovementModalOpen(true); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <IconArrowsExchange /> Mouvement global
+          </button>
+          <button className={styles.btnPrimary} onClick={handleOpenCreateModal} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <IconPlus /> Nouveau Produit
           </button>
         </div>
       </div>
 
-      {/* Statistiques */}
-      <div className={styles.statsGrid}>
+      {/* Statistiques enrichies */}
+      <div className={styles.statsGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
         <div className={styles.statCard}>
-          <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#6b7280', textTransform: 'uppercase' }}>Total Références Actives</span>
+          <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#6b7280', textTransform: 'uppercase' }}>Références Actives</span>
           <div style={{ fontSize: '1.75rem', fontWeight: '800', marginTop: '4px', color: '#111827' }}>{totalProducts}</div>
         </div>
         <div className={styles.statCard}>
@@ -151,6 +276,14 @@ export default function Stock() {
           <div style={{ fontSize: '1.75rem', fontWeight: '800', marginTop: '4px', color: alertProducts > 0 ? '#dc2626' : '#16a34a' }}>
             {alertProducts}
           </div>
+        </div>
+        <div className={styles.statCard}>
+          <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#2563eb', textTransform: 'uppercase' }}>Entrées (Mouvements)</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: '800', marginTop: '4px', color: '#2563eb' }}>{totalEntreesCount}</div>
+        </div>
+        <div className={styles.statCard}>
+          <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#ea580c', textTransform: 'uppercase' }}>Sorties (Consommation)</span>
+          <div style={{ fontSize: '1.75rem', fontWeight: '800', marginTop: '4px', color: '#ea580c' }}>{totalSortiesCount}</div>
         </div>
       </div>
 
@@ -178,18 +311,18 @@ export default function Stock() {
                 boxShadow: activeTab === 'movements' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
               }}
             >
-              Mouvements
+              Historique Mouvements ({filteredMovements.length})
             </button>
           </div>
 
-          {activeTab === 'products' && (
+          {activeTab === 'products' ? (
             <div className={styles.controlsGroup}>
               <button
                 onClick={() => setShowArchived(!showArchived)}
                 className={styles.btnSecondary}
-                style={{ fontSize: '0.8rem' }}
+                style={{ fontSize: '0.8rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
-                {showArchived ? '📂 Voir les actifs' : '📦 Voir les archivés'}
+                <IconArchive /> {showArchived ? 'Voir les actifs' : 'Voir les archivés'}
               </button>
 
               <input
@@ -211,6 +344,25 @@ export default function Stock() {
                 <option value="Général">Général</option>
               </select>
             </div>
+          ) : (
+            <div className={styles.controlsGroup}>
+              <input
+                type="text"
+                className={styles.searchInput}
+                placeholder="Rechercher produit ou motif..."
+                value={movementSearch}
+                onChange={(e) => setMovementSearch(e.target.value)}
+              />
+              <select
+                className={styles.categorySelect}
+                value={movementSensFilter}
+                onChange={(e) => setMovementSensFilter(e.target.value)}
+              >
+                <option value="ALL">Tous les sens</option>
+                <option value="entree">Entrées uniquement</option>
+                <option value="sortie">Sorties uniquement</option>
+              </select>
+            </div>
           )}
         </div>
 
@@ -218,7 +370,9 @@ export default function Stock() {
         {loading ? (
           <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>Chargement des données...</div>
         ) : error ? (
-          <div style={{ padding: '24px', color: '#dc2626', backgroundColor: '#fef2f2', margin: '16px', borderRadius: '8px' }}>⚠️ {error}</div>
+          <div style={{ padding: '24px', color: '#dc2626', backgroundColor: '#fef2f2', margin: '16px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <IconAlertTriangle /> {error}
+          </div>
         ) : activeTab === 'products' ? (
           <>
             {/* VUE CARTES MOBILE */}
@@ -231,6 +385,7 @@ export default function Stock() {
                 filteredProducts.map((p) => {
                   const hasHistory = checkHasHistory(p.id);
                   const isArchived = !Boolean(p.is_active);
+                  const healthPercent = getStockHealthPercent(Number(p.quantite), Number(p.seuil_min));
 
                   return (
                     <div key={p.id} className={styles.mobileCard} style={{ opacity: isArchived ? 0.6 : 1 }}>
@@ -240,39 +395,70 @@ export default function Stock() {
                           <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{p.categorie || p.category}</span>
                         </div>
                         {isArchived ? (
-                          <span style={{ padding: '2px 6px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', backgroundColor: '#f3f4f6', color: '#4b5563' }}>📦 Archivé</span>
+                          <span style={{ padding: '2px 8px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', backgroundColor: '#f3f4f6', color: '#4b5563', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <IconArchive /> Archivé
+                          </span>
                         ) : p.alerte ? (
-                          <span style={{ padding: '2px 6px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', backgroundColor: '#fef2f2', color: '#dc2626' }}>⚠️ Stock bas</span>
+                          <span style={{ padding: '2px 8px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', backgroundColor: '#fef2f2', color: '#dc2626', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <IconAlertTriangle /> Stock bas
+                          </span>
                         ) : (
-                          <span style={{ padding: '2px 6px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', backgroundColor: '#f0fdf4', color: '#16a34a' }}>✓ En stock</span>
+                          <span style={{ padding: '2px 8px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', backgroundColor: '#f0fdf4', color: '#16a34a' }}>
+                            En stock
+                          </span>
                         )}
                       </div>
 
                       <div className={styles.mobileCardBody}>
                         <div>Quantité: <strong>{p.quantite} {p.unite}</strong></div>
-                        <div>Seuil: {p.seuil_min} {p.unite}</div>
+                        <div>Seuil d'alerte: {p.seuil_min} {p.unite}</div>
+
+                        <div style={{ marginTop: '0.5rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#64748b', marginBottom: '2px' }}>
+                            <span>Niveau de stock</span>
+                            <span>{healthPercent}%</span>
+                          </div>
+                          <div style={{ height: '6px', backgroundColor: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
+                            <div
+                              style={{
+                                height: '100%',
+                                width: `${healthPercent}%`,
+                                backgroundColor: p.alerte ? '#ef4444' : (healthPercent < 50 ? '#f59e0b' : '#10b981'),
+                                transition: 'width 0.3s ease'
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
 
                       <div className={styles.mobileCardActions}>
+                        {!isArchived && (
+                          <button
+                            onClick={() => handleOpenQuickMovement(p)}
+                            style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid #bfdbfe', backgroundColor: '#eff6ff', color: '#2563eb', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                          >
+                            <IconArrowsExchange /> Mouvement
+                          </button>
+                        )}
                         <button
                           onClick={() => handleOpenEditModal(p)}
-                          style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid #d1d5db', backgroundColor: '#fff', fontSize: '12px', fontWeight: '600' }}
+                          style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid #d1d5db', backgroundColor: '#fff', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                         >
-                          ✏️ Modifier
+                          <IconEdit /> Modifier
                         </button>
                         {isArchived ? (
                           <button
                             onClick={() => handleRestoreProduct(p)}
-                            style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid #bbf7d0', backgroundColor: '#f0fdf4', color: '#16a34a', fontSize: '12px', fontWeight: '600' }}
+                            style={{ padding: '6px 10px', borderRadius: '4px', border: '1px solid #bbf7d0', backgroundColor: '#f0fdf4', color: '#16a34a', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                           >
-                            🔄 Restaurer
+                            <IconRefresh /> Restaurer
                           </button>
                         ) : (
                           <button
                             onClick={() => handleDeleteProduct(p)}
-                            style={{ padding: '6px 10px', borderRadius: '4px', border: `1px solid ${hasHistory ? '#ffedd5' : '#fecaca'}`, backgroundColor: hasHistory ? '#fff7ed' : '#fef2f2', color: hasHistory ? '#c2410c' : '#dc2626', fontSize: '12px', fontWeight: '600' }}
+                            style={{ padding: '6px 10px', borderRadius: '4px', border: `1px solid ${hasHistory ? '#ffedd5' : '#fecaca'}`, backgroundColor: hasHistory ? '#fff7ed' : '#fef2f2', color: hasHistory ? '#c2410c' : '#dc2626', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                           >
-                            {hasHistory ? '📦 Archiver' : '🗑️ Supprimer'}
+                            {hasHistory ? <><IconArchive /> Archiver</> : <><IconTrash /> Supprimer</>}
                           </button>
                         )}
                       </div>
@@ -290,6 +476,7 @@ export default function Stock() {
                     <th>Nom du produit</th>
                     <th>Catégorie</th>
                     <th>Quantité en stock</th>
+                    <th>Niveau visuel</th>
                     <th>Seuil d'alerte</th>
                     <th>Statut</th>
                     <th style={{ textAlign: 'right' }}>Actions</th>
@@ -298,7 +485,7 @@ export default function Stock() {
                 <tbody>
                   {filteredProducts.length === 0 ? (
                     <tr>
-                      <td colSpan="6" style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>
+                      <td colSpan="7" style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>
                         {showArchived ? 'Aucun produit archivé.' : 'Aucun produit actif trouvé.'}
                       </td>
                     </tr>
@@ -306,6 +493,7 @@ export default function Stock() {
                     filteredProducts.map((p) => {
                       const hasHistory = checkHasHistory(p.id);
                       const isArchived = !Boolean(p.is_active);
+                      const healthPercent = getStockHealthPercent(Number(p.quantite), Number(p.seuil_min));
 
                       return (
                         <tr key={p.id} style={{ opacity: isArchived ? 0.6 : 1 }}>
@@ -314,37 +502,64 @@ export default function Stock() {
                           <td style={{ fontWeight: '700' }}>
                             {p.quantite} <span style={{ fontSize: '11px', fontWeight: 'normal', color: '#6b7280' }}>{p.unite}</span>
                           </td>
+                          <td style={{ width: '120px' }}>
+                            <div style={{ width: '100%', height: '8px', backgroundColor: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                              <div
+                                style={{
+                                  height: '100%',
+                                  width: `${healthPercent}%`,
+                                  backgroundColor: p.alerte ? '#ef4444' : (healthPercent < 50 ? '#f59e0b' : '#10b981'),
+                                  transition: 'width 0.3s ease'
+                                }}
+                              />
+                            </div>
+                          </td>
                           <td style={{ color: '#6b7280' }}>{p.seuil_min} {p.unite}</td>
                           <td>
                             {isArchived ? (
-                              <span style={{ padding: '2px 6px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', backgroundColor: '#f3f4f6', color: '#4b5563' }}>📦 Archivé</span>
+                              <span style={{ padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600', backgroundColor: '#f3f4f6', color: '#4b5563', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                <IconArchive /> Archivé
+                              </span>
                             ) : p.alerte ? (
-                              <span style={{ padding: '2px 6px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', backgroundColor: '#fef2f2', color: '#dc2626' }}>⚠️ Stock bas</span>
+                              <span style={{ padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600', backgroundColor: '#fef2f2', color: '#dc2626', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                                <IconAlertTriangle /> Stock bas
+                              </span>
                             ) : (
-                              <span style={{ padding: '2px 6px', borderRadius: '10px', fontSize: '11px', fontWeight: '600', backgroundColor: '#f0fdf4', color: '#16a34a' }}>✓ En stock</span>
+                              <span style={{ padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: '600', backgroundColor: '#f0fdf4', color: '#16a34a' }}>
+                                En stock
+                              </span>
                             )}
                           </td>
                           <td style={{ textAlign: 'right' }}>
                             <div style={{ display: 'inline-flex', gap: '6px' }}>
+                              {!isArchived && (
+                                <button
+                                  onClick={() => handleOpenQuickMovement(p)}
+                                  style={{ padding: '4px 8px', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: '#2563eb', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                  title="Enregistrer une entrée ou sortie pour ce produit"
+                                >
+                                  <IconArrowsExchange /> Mouvement
+                                </button>
+                              )}
                               <button
                                 onClick={() => handleOpenEditModal(p)}
-                                style={{ padding: '4px 8px', backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: '#374151', cursor: 'pointer' }}
+                                style={{ padding: '4px 8px', backgroundColor: '#ffffff', border: '1px solid #d1d5db', borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: '#374151', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                               >
-                                ✏️ Modifier
+                                <IconEdit /> Modifier
                               </button>
                               {isArchived ? (
                                 <button
                                   onClick={() => handleRestoreProduct(p)}
-                                  style={{ padding: '4px 8px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: '#16a34a', cursor: 'pointer' }}
+                                  style={{ padding: '4px 8px', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: '#16a34a', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                                 >
-                                  🔄 Restaurer
+                                  <IconRefresh /> Restaurer
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => handleDeleteProduct(p)}
-                                  style={{ padding: '4px 8px', backgroundColor: hasHistory ? '#fff7ed' : '#fef2f2', border: `1px solid ${hasHistory ? '#ffedd5' : '#fecaca'}`, borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: hasHistory ? '#c2410c' : '#dc2626', cursor: 'pointer' }}
+                                  style={{ padding: '4px 8px', backgroundColor: hasHistory ? '#fff7ed' : '#fef2f2', border: `1px solid ${hasHistory ? '#ffedd5' : '#fecaca'}`, borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: hasHistory ? '#c2410c' : '#dc2626', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                                 >
-                                  {hasHistory ? '📦 Archiver' : '🗑️ Supprimer'}
+                                  {hasHistory ? <><IconArchive /> Archiver</> : <><IconTrash /> Supprimer</>}
                                 </button>
                               )}
                             </div>
@@ -363,41 +578,45 @@ export default function Stock() {
             <table className={styles.table}>
               <thead>
                 <tr>
-                  <th>Date</th>
+                  <th>Date & Heure</th>
                   <th>Produit</th>
-                  <th>Type</th>
+                  <th>Type / Sens</th>
                   <th>Quantité</th>
-                  <th>Motif</th>
+                  <th>Motif / Destination</th>
                 </tr>
               </thead>
               <tbody>
-                {movements.length === 0 ? (
+                {filteredMovements.length === 0 ? (
                   <tr>
                     <td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#9ca3af' }}>
-                      Aucun mouvement enregistré.
+                      Aucun mouvement ne correspond aux filtres.
                     </td>
                   </tr>
                 ) : (
-                  movements.map((m) => (
+                  filteredMovements.map((m) => (
                     <tr key={m.id}>
-                      <td style={{ color: '#6b7280' }}>
-                        {new Date(m.date_op).toLocaleDateString('fr-FR')}
+                      <td style={{ color: '#6b7280', fontSize: '0.85rem' }}>
+                        {new Date(m.date_op).toLocaleDateString('fr-FR')} {m.created_at ? new Date(m.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''}
                       </td>
                       <td style={{ fontWeight: '600', color: '#111827' }}>{m.produit}</td>
                       <td>
                         <span style={{
-                          padding: '2px 6px',
-                          borderRadius: '10px',
+                          padding: '3px 8px',
+                          borderRadius: '12px',
                           fontSize: '11px',
-                          fontWeight: '600',
+                          fontWeight: '700',
                           backgroundColor: m.sens === 'entree' ? '#eff6ff' : '#fff7ed',
-                          color: m.sens === 'entree' ? '#2563eb' : '#c2410c'
+                          color: m.sens === 'entree' ? '#2563eb' : '#c2410c',
+                          border: `1px solid ${m.sens === 'entree' ? '#bfdbfe' : '#ffedd5'}`,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
                         }}>
-                          {m.sens === 'entree' ? '↓ Entrée' : '↑ Sortie'}
+                          {m.sens === 'entree' ? <><IconArrowDown /> Entrée stock</> : <><IconArrowUp /> Sortie stock</>}
                         </span>
                       </td>
-                      <td style={{ fontWeight: '700' }}>
-                        {m.sens === 'entree' ? '+' : '-'}{m.quantite} {m.unite}
+                      <td style={{ fontWeight: '700', color: m.sens === 'entree' ? '#16a34a' : '#dc2626' }}>
+                        {m.sens === 'entree' ? '+' : '-'}{m.quantite} <span style={{ fontSize: '11px', fontWeight: 'normal', color: '#6b7280' }}>{m.unite}</span>
                       </td>
                       <td style={{ color: '#4b5563' }}>{m.motif || '-'}</td>
                     </tr>
@@ -419,9 +638,10 @@ export default function Stock() {
 
       <StockModal
         isOpen={isMovementModalOpen}
-        onClose={() => setIsMovementModalOpen(false)}
+        onClose={() => { setIsMovementModalOpen(false); setQuickProductId(null); }}
         onSuccess={fetchData}
         products={products.filter((p) => Boolean(p.is_active))}
+        initialProductId={quickProductId}
       />
     </div>
   );

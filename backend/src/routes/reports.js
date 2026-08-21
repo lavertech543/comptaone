@@ -109,4 +109,219 @@ router.get('/salaries.pdf', requirePermission('rapports','export'), async (req, 
   await logAudit({ user: req.user, action:'export', module:'rapports', details:'rapport salaires PDF' });
 });
 
+// Rapport journalier d'activité complet
+router.get('/daily.pdf', requirePermission('rapports', 'export'), async (req, res) => {
+  try {
+    const targetDate = req.query.date || new Date().toISOString().split('T')[0];
+    const dateFormatted = new Date(targetDate).toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    // 1. Récupération des données du jour ciblé
+    const feedings = await query(
+      `SELECT f.*, b.numero AS bande 
+       FROM feedings f 
+       JOIN bands b ON b.id=f.band_id 
+       WHERE f.date_op = $1 
+       ORDER BY f.created_at ASC`,
+      [targetDate]
+    );
+
+    const mortalities = await query(
+      `SELECT m.*, b.numero AS bande 
+       FROM mortalities m 
+       JOIN bands b ON b.id=m.band_id 
+       WHERE m.date_op = $1 
+       ORDER BY m.created_at ASC`,
+      [targetDate]
+    );
+
+    const treatments = await query(
+      `SELECT t.*, b.numero AS bande 
+       FROM treatments t 
+       JOIN bands b ON b.id=t.band_id 
+       WHERE t.date_op = $1 
+       ORDER BY t.created_at ASC`,
+      [targetDate]
+    );
+
+    const sales = await query(
+      `SELECT s.*, b.numero AS bande 
+       FROM sales s 
+       LEFT JOIN bands b ON b.id=s.band_id 
+       WHERE s.date_op = $1 
+       ORDER BY s.created_at ASC`,
+      [targetDate]
+    );
+
+    const purchases = await query(
+      `SELECT p.* 
+       FROM purchases p 
+       WHERE p.date_op = $1 
+       ORDER BY p.created_at ASC`,
+      [targetDate]
+    );
+
+    const transactions = await query(
+      `SELECT t.* 
+       FROM transactions t 
+       WHERE t.date_op = $1 
+       ORDER BY t.created_at ASC`,
+      [targetDate]
+    );
+
+    const stockMovs = await query(
+      `SELECT sm.*, pr.nom AS produit, b.numero AS bande 
+       FROM stock_movements sm 
+       JOIN products pr ON pr.id=sm.product_id 
+       LEFT JOIN bands b ON b.id=sm.band_id 
+       WHERE sm.date_op = $1 
+       ORDER BY sm.created_at ASC`,
+      [targetDate]
+    );
+
+    // Calculs de synthèse
+    const totalMorts = mortalities.rows.reduce((sum, m) => sum + Number(m.nombre || 0), 0);
+    const totalAlimentKg = feedings.rows.reduce((sum, f) => sum + Number(f.quantite_kg || 0), 0);
+
+    const totalVentes = sales.rows.reduce((sum, s) => sum + Number(s.montant_total || 0), 0);
+    const totalRecettesTrans = transactions.rows
+      .filter(t => t.type === 'recette')
+      .reduce((sum, t) => sum + Number(t.montant || 0), 0);
+    const totalRecettesJour = totalVentes + totalRecettesTrans;
+
+    const totalAchats = purchases.rows.reduce((sum, p) => sum + Number(p.montant_total || 0), 0);
+    const totalDepensesTrans = transactions.rows
+      .filter(t => t.type === 'depense')
+      .reduce((sum, t) => sum + Number(t.montant || 0), 0);
+    const totalChargesJour = totalAchats + totalDepensesTrans;
+
+    const soldeJour = totalRecettesJour - totalChargesJour;
+
+    // 2. Initialisation du PDF
+    const doc = await startDoc(
+      res, 
+      `rapport_journalier_${targetDate}.pdf`, 
+      "Rapport Journalier d'Activité", 
+      `Bilan complet du ${dateFormatted}`
+    );
+
+    // Bloc Synthèse & Indicateurs
+    table(doc, ['Indicateur Clé du Jour', 'Valeur Enregistrée'], [
+      ['Total Alimentation distribuée', `${totalAlimentKg.toLocaleString('fr-FR')} kg`],
+      ['Total Mortalité constatée', `${totalMorts} sujet(s)`],
+      ['Total Ventes & Recettes', fmt(totalRecettesJour)],
+      ['Total Achats & Dépenses', fmt(totalChargesJour)],
+      ['Solde Net de la journée', fmt(soldeJour)]
+    ], [260, 255]);
+
+    // Section 1: Alimentation
+    if (feedings.rows.length > 0) {
+      doc.fontSize(11).fillColor('#1a5632').text('1. Alimentation distribuée', { underline: true });
+      doc.moveDown(0.3);
+      table(doc, ['Bande', 'Type d’aliment', 'Quantité (kg)', 'Observations'],
+        feedings.rows.map(f => [f.bande, f.type_aliment || '—', `${Number(f.quantite_kg).toLocaleString('fr-FR')} kg`, f.observations || '—']),
+        [100, 150, 100, 165]
+      );
+    }
+
+    // Section 2: Mortalité
+    if (mortalities.rows.length > 0) {
+      doc.fontSize(11).fillColor('#1a5632').text('2. Mortalités enregistrées', { underline: true });
+      doc.moveDown(0.3);
+      table(doc, ['Bande', 'Nombre', 'Cause suspectée', 'Observations'],
+        mortalities.rows.map(m => [m.bande, `${m.nombre} mort(s)`, m.cause || 'Non précisée', m.observations || '—']),
+        [100, 90, 160, 165]
+      );
+    }
+
+    // Section 3: Traitements sanitaires
+    if (treatments.rows.length > 0) {
+      doc.fontSize(11).fillColor('#1a5632').text('3. Traitements & Soins sanitaires', { underline: true });
+      doc.moveDown(0.3);
+      table(doc, ['Bande', 'Produit', 'Type', 'Dose', 'Observations'],
+        treatments.rows.map(t => [t.bande, t.produit, t.type || '—', t.dose || '—', t.observations || '—']),
+        [90, 120, 80, 80, 145]
+      );
+    }
+
+    // Section 4: Ventes
+    if (sales.rows.length > 0) {
+      doc.fontSize(11).fillColor('#1a5632').text('4. Ventes effectuées', { underline: true });
+      doc.moveDown(0.3);
+      table(doc, ['Client', 'Bande', 'Qté', 'Prix unitaire', 'Montant Total', 'Paiement'],
+        sales.rows.map(s => [
+          s.client || 'Client comptant', 
+          s.bande || '—', 
+          s.quantite, 
+          fmt(s.prix_unitaire), 
+          fmt(s.montant_total), 
+          s.mode_paiement || 'Espèces'
+        ]),
+        [120, 70, 45, 90, 100, 90]
+      );
+    }
+
+    // Section 5: Achats & Dépenses
+    const allExpenses = [
+      ...purchases.rows.map(p => ({
+        libelle: p.description || p.fournisseur || 'Achat matériel/intrant',
+        categorie: p.categorie || 'Achat',
+        montant: p.montant_total,
+        mode: p.mode_paiement || '—'
+      })),
+      ...transactions.rows.filter(t => t.type === 'depense').map(t => ({
+        libelle: t.motif || t.tiers || 'Dépense courante',
+        categorie: t.categorie || 'Dépense',
+        montant: t.montant,
+        mode: t.mode_paiement || '—'
+      }))
+    ];
+
+    if (allExpenses.length > 0) {
+      doc.fontSize(11).fillColor('#1a5632').text('5. Achats & Dépenses de la journée', { underline: true });
+      doc.moveDown(0.3);
+      table(doc, ['Libellé / Tiers', 'Catégorie', 'Montant', 'Mode de paiement'],
+        allExpenses.map(e => [e.libelle, e.categorie, fmt(e.montant), e.mode]),
+        [180, 120, 115, 100]
+      );
+    }
+
+    // Section 6: Mouvements de stock
+    if (stockMovs.rows.length > 0) {
+      doc.fontSize(11).fillColor('#1a5632').text('6. Mouvements de stock du jour', { underline: true });
+      doc.moveDown(0.3);
+      table(doc, ['Produit', 'Sens', 'Quantité', 'Motif', 'Bande'],
+        stockMovs.rows.map(sm => [
+          sm.produit, 
+          sm.sens === 'entree' ? 'ENTRÉE' : 'SORTIE', 
+          sm.quantite, 
+          sm.motif || '—', 
+          sm.bande || '—'
+        ]),
+        [130, 65, 65, 160, 95]
+      );
+    }
+
+    footer(doc);
+    doc.end();
+
+    await logAudit({ 
+      user: req.user, 
+      action: 'export', 
+      module: 'rapports', 
+      details: `rapport journalier PDF du ${targetDate}` 
+    });
+  } catch (err) {
+    console.error('Erreur génération rapport journalier PDF :', err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Erreur lors de la génération du rapport journalier PDF' });
+    }
+  }
+});
+
 export default router;
+

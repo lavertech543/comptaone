@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, NavLink, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, NavLink, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext.jsx';
 import { api } from './api.js';
+import InitialSetup from './pages/InitialSetup.jsx';
 import Login from './pages/Login.jsx';
 import SetPassword from './pages/SetPassword.jsx';
+import ForcePasswordChange from './pages/ForcePasswordChange.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Buildings from './pages/Buildings.jsx';
 import Bands from './pages/Bands.jsx';
@@ -21,23 +23,24 @@ import Audit from './pages/Audit.jsx';
 import User from './pages/Users.jsx';
 import Reports from './pages/Reports.jsx';
 import Setting from './pages/Settings.jsx';
+import LogoutConfirmModal from './components/LogoutConfirmModal.jsx';
 import logoNk from './pages/photo.png';
-import { 
-  LayoutDashboard, 
-  Building2, 
-  Bird, 
-  Wheat, 
-  Package, 
-  ShoppingBag, 
-  TrendingUp, 
-  Receipt, 
-  Calculator, 
-  FileSpreadsheet, 
-  Users, 
-  FileText, 
-  Wrench, 
-  ShieldCheck, 
-  UserCog, 
+import {
+  LayoutDashboard,
+  Building2,
+  Bird,
+  Wheat,
+  Package,
+  ShoppingBag,
+  TrendingUp,
+  Receipt,
+  Calculator,
+  FileSpreadsheet,
+  Users,
+  FileText,
+  Wrench,
+  ShieldCheck,
+  UserCog,
   Settings,
   Bell,
   Menu,
@@ -69,22 +72,39 @@ function roleLabel(r) {
     magasinier: 'Magasinier',
     comptable: 'Comptable',
     responsable: 'Responsable de ferme',
-    veterinaire:'veterinaire'
+    veterinaire: 'veterinaire'
   }[r] || r;
 }
 
 function Layout({ children }) {
   const { user, logout, can } = useAuth();
   const [open, setOpen] = useState(false);
+  const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [notifs, setNotifs] = useState([]);
   const loc = useLocation();
+  const navigate = useNavigate();
+
+  const goToAlertes = () => {
+    if (loc.pathname === '/') {
+      document.getElementById('alertes-systeme')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/');
+      setTimeout(() => {
+        document.getElementById('alertes-systeme')?.scrollIntoView({ behavior: 'smooth' });
+      }, 300);
+    }
+  };
 
   useEffect(() => { setOpen(false); }, [loc]);
   useEffect(() => {
-    const load = () => api.get('/notifications').then(setNotifs).catch(() => {});
-    load(); 
-    const id = setInterval(load, 60000); 
-    return () => clearInterval(id);
+    const load = () => api.get('/notifications').then(setNotifs).catch(() => { });
+    load();
+    const id = setInterval(load, 60000);
+    window.addEventListener('notifs:reload', load);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener('notifs:reload', load);
+    };
   }, []);
 
   const visible = MENU.filter(m => {
@@ -103,14 +123,14 @@ function Layout({ children }) {
         <div className="brand">
           <img src={logoNk} alt="N&K SARL" className="sidebar-logo-img" />
           <span className='login-header sub'>ComptaOne</span>
-       </div>
+        </div>
         <nav>
           {visible.map(m => {
             const IconComponent = m.icon;
             return (
-              <NavLink 
-                key={m.to} 
-                to={m.to} 
+              <NavLink
+                key={m.to}
+                to={m.to}
                 end={m.to === '/'}
               >
                 <IconComponent size={18} />
@@ -136,42 +156,61 @@ function Layout({ children }) {
           </div>
 
           <div className="topbar-actions">
-            <NavLink to="/" className="notif-btn" title="Alertes">
+            <button className="notif-btn" onClick={goToAlertes} title="Alertes système">
               <Bell size={18} />
               {unread > 0 && <span className="badge">{unread}</span>}
-            </NavLink>
-            
-            <button className="btn-logout" onClick={logout} title="Se déconnecter">
+            </button>
+
+            <button className="btn-logout" onClick={() => setLogoutConfirm(true)} title="Se déconnecter">
               <LogOut size={16} />
               <span>Déconnexion</span>
             </button>
           </div>
         </header>
-        
+
         <main className="content">
           {children}
         </main>
       </div>
+
+      <LogoutConfirmModal
+        open={logoutConfirm}
+        onClose={() => setLogoutConfirm(false)}
+        onConfirm={() => { setLogoutConfirm(false); logout(); }}
+        userName={user?.full_name}
+      />
     </div>
   );
 }
 
-function Guard({ module, action='view', children }) {
+function Guard({ module, action = 'view', children }) {
   const { can } = useAuth();
   if (module && !can(module, action)) return <div className="empty">Accès non autorisé à ce module.</div>;
   return children;
 }
 
 export default function App() {
-  const { user, loading } = useAuth();
-
-  // Route d'activation de compte, accessible même sans connexion
-  if (window.location.pathname === '/set-password') {
-    return <SetPassword />;
-  }
+  const { user, loading, setupRequired } = useAuth();
+  const location = useLocation();
 
   if (loading) return <div className="login"><div className="login-box center">Chargement…</div></div>;
+
+  // Route d'activation de compte par lien email (accessible sans être connecté)
+  if (location.pathname === '/set-password') {
+    return (
+      <Routes>
+        <Route path="/set-password" element={<SetPassword />} />
+        <Route path="*" element={<Navigate to="/set-password" replace />} />
+      </Routes>
+    );
+  }
+
+  if (setupRequired) return <InitialSetup />;
   if (!user) return <Login />;
+
+  // Uniquement pour l'admin lors de sa première connexion (mot de passe prédéfini)
+  if (user.must_change_password) return <ForcePasswordChange />;
+
   return (
     <Layout>
       <Routes>
@@ -190,7 +229,7 @@ export default function App() {
         <Route path="/audit" element={<Guard module="audit"><Audit /></Guard>} />
         <Route path="/utilisateurs" element={<Guard module="utilisateurs"><User /></Guard>} />
         <Route path="/parametres" element={<Setting />} />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
   );

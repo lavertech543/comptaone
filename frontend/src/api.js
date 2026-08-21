@@ -1,13 +1,30 @@
 const TOKEN_KEY = 'nk_token';
-let inactivityTimer = null;
 const onExpire = [];
 export const onSessionExpire = (cb) => onExpire.push(cb);
 
-export function getToken() { return localStorage.getItem(TOKEN_KEY); }
-export function setToken(t) { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); }
+// VULN-20 FIX: Utilisation prioritaire de sessionStorage pour réduire l'exposition à la persistance XSS
+export function getToken() {
+  return sessionStorage.getItem(TOKEN_KEY) || localStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(t) {
+  if (t) {
+    sessionStorage.setItem(TOKEN_KEY, t);
+    localStorage.setItem(TOKEN_KEY, t);
+  } else {
+    sessionStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem('nk_last_activity');
+    localStorage.removeItem('nk_last_activity');
+  }
+}
 
 // Suivi d'activité pour déconnexion auto (4.1)
-export function touchActivity() { localStorage.setItem('nk_last_activity', String(Date.now())); }
+export function touchActivity() {
+  const now = String(Date.now());
+  sessionStorage.setItem('nk_last_activity', now);
+  localStorage.setItem('nk_last_activity', now);
+}
 
 async function req(method, path, body, isForm) {
   const headers = {};
